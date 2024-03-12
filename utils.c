@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:14:24 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/11 15:48:35 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/12 11:50:17 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,4 +102,35 @@ char	*ft_strjoin(char *s1, char *s2, int do_free)
 	if (do_free == 2 || do_free == 3)
 		free(s2);
 	return (s3);
+}
+
+char	*ft_strdup(char *src)
+{
+	char	*dup;
+	int		i;
+
+	i = 0;
+	while (src[i])
+		i++;
+	dup = malloc(i + 1);
+	if (dup != NULL)
+	{
+		i = 0;
+		while (src[i])
+		{
+			dup[i] = src[i];
+			i++;
+		}
+		dup[i] = '\0';
+	}
+	return (dup);
+}
+
+void	ft_putstr_fd(char *str, int fd)
+{
+	int	i;
+
+	i = -1;
+	while (str[++i])
+		write(fd, &str[i], 1);
 }

@@ -6,7 +6,7 @@ INCLUDE = ./
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror 
 
-FILES = main.c parse.c utils.c ft_split.c
+FILES = main.c parse.c builtins.c utils.c ft_split.c instruct.c
 OBJECTS = $(addprefix $(SRCS), $(FILES:.c=.o))
 
 %.o: %.c

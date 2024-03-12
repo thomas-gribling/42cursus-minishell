@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 14:36:14 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/11 15:57:56 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/12 15:59:27 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,23 +66,44 @@ char	*try_path(char **strs, char *str)
 	return (NULL);
 }
 
-void	do_command(char *content, char **envp)
+int	ft_execve(char *path, char **argv, char **envp)
+{
+	pid_t	p;
+	
+	p = fork();
+	if (p < 0)
+		return (1);
+	if (p == 0)
+		execve(path, argv, envp);
+	waitpid(p, NULL, 0);
+	return (0);
+}
+
+void	exe_command(char *command, char **envp)
 {
 	char	**paths;
 	char	**cmd;
-	pid_t	p;
+	char	*cmd_err;
 
-	paths = get_paths(envp);
-	cmd = ft_split(content, ' ');
-	cmd[0] = try_path(paths, cmd[0]);
-	if (!cmd[0])
-		printf("Command not found!\n");
+	cmd = ft_split(command, ' ');
+	if (!exe_builtin(cmd, envp))
+		return ;
+	cmd_err = ft_strdup(cmd[0]);
+	if (command[0] == '/' || (command[0] == '.' && command[1] == '/'))
+		ft_execve(cmd[0], cmd, envp);
 	else
 	{
-		p = fork();
-		if (p == 0)
-			execve(cmd[0], cmd, envp);
-		waitpid(p, NULL, 0);
+		paths = get_paths(envp);
+		cmd[0] = try_path(paths, cmd[0]);
+		tab_free(paths);
+		if (!cmd[0])
+		{
+			ft_putstr_fd("command not found: ", 2);
+			ft_putstr_fd(cmd_err, 2);
+			ft_putstr_fd("\n", 2);
+		}
+		else
+			ft_execve(cmd[0], cmd, envp);
 	}
 }
 
@@ -93,7 +114,7 @@ int	is_valid_char(char c)
 	return (1);
 }
 
-void	parse_buffer(char *buffer, char **envp)
+void	parse_buffer(char *buffer, char **envp, t_instruct instruct)
 {
 	int		i;
 	int		start;
@@ -101,6 +122,7 @@ void	parse_buffer(char *buffer, char **envp)
 
 	i = -1;
 	start = 0;
+	(void)instruct;
 	while (buffer[++i])
 	{
 		if (!is_valid_char(buffer[i]))
@@ -109,14 +131,14 @@ void	parse_buffer(char *buffer, char **envp)
 			start = i + 1;
 			while (!is_valid_char(buffer[++i]) || buffer[i] == ' ')
 				start++;
-			do_command(tmp, envp);
+			exe_command(tmp, envp);
 			free(tmp);
 		}
 	}
 	if (start != i)
 	{
 		tmp = ft_substr(buffer, start, i);
-		do_command(tmp, envp);
+		exe_command(tmp, envp);
 		free(tmp);
 	}
 }
