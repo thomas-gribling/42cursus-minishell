@@ -12,7 +12,21 @@
 
 #include "minishell.h"
 
-t_instruct	init_tabinstruct(char *str)
+void	pipes_init(t_instruct *instruct)
+{
+	int	i;
+
+	i = -1;
+	instruct->pipes = malloc(sizeof(int *) * instruct->size);
+	while (++i < instruct->size)
+	{
+		instruct->pipes[i] = malloc(sizeof(int) * 2);
+		if (pipe(instruct->pipes[i]) < 0)
+			ft_putstr_fd("pipe error\n", 2);
+	}
+}
+
+t_instruct	init_tabinstruct(char *str, char **envp)
 {
 	t_instruct	tab;
 	int			i;
@@ -25,13 +39,15 @@ t_instruct	init_tabinstruct(char *str)
 	while (str[++i])
 		if (str[i] == '|')
 			tab.size++;
-	tab.tab_instruct = malloc(sizeof(int) * tab.size);
+	tab.i_tab = malloc(sizeof(int) * tab.size);
 	j = -1;
 	i = -1;
 	while (str[++i])
 	{
 		if (str[i] == '|')
-			tab.tab_instruct[++j] = PIPE;
+			tab.i_tab[++j] = PIPE;
 	}
+	pipes_init(&tab);
+	tab.envp = envp;
 	return (tab);
 }

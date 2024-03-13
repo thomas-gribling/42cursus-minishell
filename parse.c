@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 14:36:14 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/12 15:59:27 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/13 16:55:08 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,20 +66,96 @@ char	*try_path(char **strs, char *str)
 	return (NULL);
 }
 
-int	ft_execve(char *path, char **argv, char **envp)
+void	close_all_pipes(t_instruct *ins, int close_before, int close_curr)
+{
+	int	i;
+
+	i = -1;
+	while (++i < ins->size)
+	{
+		if (i == ins->ind  && !close_curr)
+			continue ;
+		else if (i == ins->ind - 1 && !close_before)
+			continue ;
+		else
+		{
+			close(ins->pipes[i][0]);
+			close(ins->pipes[i][1]);
+		}
+	}
+}
+
+void	dup_fds(t_instruct *ins, int do_pipe)
+{
+	if (do_pipe == 0)
+		close_all_pipes(ins, 1, 0);
+	if (do_pipe == 1)
+	{
+		dup2(ins->pipes[ins->ind - 1][0], 0);
+		close(ins->pipes[ins->ind - 1][1]);
+		close_all_pipes(ins, 0, 1);
+	}
+	if (do_pipe == 2)
+	{
+		dup2(ins->pipes[ins->ind][1], 1);
+		close(ins->pipes[ins->ind][0]);
+		close_all_pipes(ins, 1, 0);
+	}
+	if (do_pipe == 3)
+	{
+		dup2(ins->pipes[ins->ind - 1][0], 0);
+		close(ins->pipes[ins->ind - 1][1]);
+		dup2(ins->pipes[ins->ind][1], 1);
+		close(ins->pipes[ins->ind][0]);
+		close_all_pipes(ins, 0, 0);
+	}
+}
+
+int	ft_execve(char *path, char **argv, t_instruct *ins, int do_pipe)
 {
 	pid_t	p;
-	
+	char	**envp;
+
+	if (ins)
+		envp = ins->envp;
+	else
+		envp = NULL;
 	p = fork();
 	if (p < 0)
-		return (1);
+		return (ft_putstr_fd("fork error", 2), 1);
 	if (p == 0)
+	{
+		dup_fds(ins, do_pipe);
 		execve(path, argv, envp);
+	}
 	waitpid(p, NULL, 0);
 	return (0);
 }
 
-void	exe_command(char *command, char **envp)
+void	call_ft_execve(char **cmd, t_instruct *ins)
+{
+	int	ind;
+
+	if (ins)
+		ind = ins->ind;
+	if (ins && ind <= ins->size)
+	{
+		if (!ind && !ins->size)
+			ft_execve(cmd[0], cmd, ins, 0);
+		if (!ind && ins->i_tab[ind] == PIPE)
+			ft_execve(cmd[0], cmd, ins, 2);
+		if (ind && ins->i_tab[ind - 1] == PIPE && ins->i_tab[ind] != PIPE)
+			ft_execve(cmd[0], cmd, ins, 1);
+		if (ind && ins->i_tab[ind - 1] != PIPE && ins->i_tab[ind] == PIPE)
+			ft_execve(cmd[0], cmd, ins, 2);
+		if (ind && ins->i_tab[ind - 1] == PIPE && ins->i_tab[ind] == PIPE)
+			ft_execve(cmd[0], cmd, ins, 3);
+	}
+	else
+		ft_execve(cmd[0], cmd, ins, 0);
+}
+
+void	exe_command(char *command, char **envp, t_instruct *ins)
 {
 	char	**paths;
 	char	**cmd;
@@ -90,7 +166,7 @@ void	exe_command(char *command, char **envp)
 		return ;
 	cmd_err = ft_strdup(cmd[0]);
 	if (command[0] == '/' || (command[0] == '.' && command[1] == '/'))
-		ft_execve(cmd[0], cmd, envp);
+		call_ft_execve(cmd, ins);
 	else
 	{
 		paths = get_paths(envp);
@@ -103,7 +179,7 @@ void	exe_command(char *command, char **envp)
 			ft_putstr_fd("\n", 2);
 		}
 		else
-			ft_execve(cmd[0], cmd, envp);
+			call_ft_execve(cmd, ins);
 	}
 }
 
@@ -114,7 +190,7 @@ int	is_valid_char(char c)
 	return (1);
 }
 
-void	parse_buffer(char *buffer, char **envp, t_instruct instruct)
+void	parse_buffer(char *buffer, char **envp, t_instruct *instruct)
 {
 	int		i;
 	int		start;
@@ -122,23 +198,26 @@ void	parse_buffer(char *buffer, char **envp, t_instruct instruct)
 
 	i = -1;
 	start = 0;
+	instruct->ind = -1;
 	(void)instruct;
 	while (buffer[++i])
 	{
 		if (!is_valid_char(buffer[i]))
 		{
+			instruct->ind++;
 			tmp = ft_substr(buffer, start, i - start);
 			start = i + 1;
 			while (!is_valid_char(buffer[++i]) || buffer[i] == ' ')
 				start++;
-			exe_command(tmp, envp);
+			exe_command(tmp, envp, instruct);
 			free(tmp);
 		}
 	}
 	if (start != i)
 	{
+		instruct->ind++;
 		tmp = ft_substr(buffer, start, i);
-		exe_command(tmp, envp);
+		exe_command(tmp, envp, instruct);
 		free(tmp);
 	}
 }

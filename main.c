@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 10:46:51 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/12 15:24:56 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/13 16:27:15 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,13 @@ int	main(int ac, char **av, char **envp)
 	signal(SIGINT, SIG_IGN);
 	sigaction(SIGINT, &ctrl_c, NULL);
 	signal(SIGQUIT, SIG_IGN);
-	exe_command("clear", envp);
+	exe_command("clear", envp, NULL);
 	print_header();
 	line = readline("minishell$ ");
 	while (line && ft_strcmp(line, "exit"))
 	{
-		instruct = init_tabinstruct(line);
-		parse_buffer(line, envp, instruct);
+		instruct = init_tabinstruct(line, envp);
+		parse_buffer(line, envp, &instruct);
 		add_history(line);
 		if (!ft_strcmp(line, "clear"))
 			print_header();

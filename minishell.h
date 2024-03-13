@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/12 15:58:56 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/13 16:55:42 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,15 +38,18 @@
 
 typedef struct s_instruct
 {
-	int		*tab_instruct;
 	int		size;
+	int		ind;
+	int		*i_tab;
+	int		**pipes;
+	char	**envp;
 }			t_instruct;
 
-void		parse_buffer(char *buffer, char **envp, t_instruct instruct);
-void		exe_command(char *command, char **envp);
+void		parse_buffer(char *buffer, char **envp, t_instruct *instruct);
+void		exe_command(char *command, char **envp, t_instruct *ins);
 int			exe_builtin(char **cmd, char **envp);
 
-t_instruct	init_tabinstruct(char *str);
+t_instruct	init_tabinstruct(char *str, char **envp);
 
 int			ft_strcmp(char *s1, char *s2);
 int			ft_strncmp(char *s1, char *s2, unsigned int n);
