@@ -3,31 +3,39 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/13 12:19:28 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/03/15 12:41:14 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/15 17:14:30 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	size_tab(char *s, int c)
+int	size_tab(char *s, int c, char t)
 {
-	int	i;
-	int	size;
+	int		i;
+	int		size;
 
 	i = 0;
 	size = 0;
 	while (s[i] != '\0')
 	{
-		while (s[i] == c)
+		while (s[i] == c && s[i])
 			i++;
 		if (s[i] != '\0' && s[i] != c)
 		{
 			size++;
 			while (s[i] != '\0' && s[i] != c)
+			{
+				if (s[i] == '\'' || s[i] == '"')
+				{
+					t = s[i];
+					while (s[++i] != t && s[i] != '\0')
+						continue ;
+				}
 				i++;
+			}
 		}
 	}
 	return (size);
@@ -35,19 +43,33 @@ int	size_tab(char *s, int c)
 
 int	strstrlen(char *s, char c)
 {
-	int	i;
+	int		i;
+	int		nb;
+	char	t;
 
 	i = 0;
+	nb = 0;
 	while (s[i] != c && s[i])
+	{
+		if (s[i] == '\'' || s[i] == '"')
+		{
+			t = s[i];
+			nb++;
+			while (s[++i] != t)
+				continue ;
+		}
 		i++;
-	return (i);
+	}
+	return (i - (nb * 2));
 }
 
 char	*fill_tab(char *s, char c, char **tab, int i)
 {
-	int	size_low;	
-	int	j;
+	int		size_low;	
+	int		j;
+	char	t;
 
+	t = '"';
 	while (*s == c)
 		s++;
 	size_low = strstrlen(s, c);
@@ -55,6 +77,22 @@ char	*fill_tab(char *s, char c, char **tab, int i)
 	j = -1;
 	while (++j < size_low)
 	{
+		if (*s == '\'' || *s == '"')
+		{
+			t = *s;
+			s++;
+			while (*s != t && *s != '\0')
+			{
+				tab[i][j++] = *s;
+				s++;
+			}
+			s++;
+		}
+		if (*s == c)
+		{
+			tab[i][j] = '\0';
+			return (s);
+		}
 		tab[i][j] = *s;
 		s++;
 	}
@@ -71,7 +109,7 @@ char	**ft_split(char *s, char c)
 	i = -1;
 	if (s == NULL || !s)
 		return (NULL);
-	size = size_tab(s, c);
+	size = size_tab(s, c, '"');
 	tab = (char **)malloc(sizeof(char *) * (size + 1));
 	if (tab == NULL)
 		return (NULL);
@@ -80,12 +118,11 @@ char	**ft_split(char *s, char c)
 	tab[i] = NULL;
 	return (tab);
 }
-/*#include <stdio.h>
-int	main(int argc, char **argv)
+
+/*int	main(int argc, char **argv)
 {
 	int	i;
 	char	**tab;
-	//char	**tab2;
 
 	if (argc != 3)
 		return (1);
@@ -102,10 +139,4 @@ int	main(int argc, char **argv)
 	while (tab[++i])
 		free(tab[i]);
 	free(tab);
-	tab2 = ft_split("aa\0bbb", '\0');
-	if (!tab || tab == NULL)
-		printf("vide");
-	while (tab2[++i])
-		printf("2:|%s|\n", tab2[i]);
-	return (0);
 }*/
