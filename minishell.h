@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/13 16:55:42 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/15 15:37:48 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <signal.h>
+# include <dirent.h>
 # include <sys/signal.h>
 # include <sys/wait.h>
 # include <readline/readline.h>
@@ -45,20 +46,30 @@ typedef struct s_instruct
 	char	**envp;
 }			t_instruct;
 
-void		parse_buffer(char *buffer, char **envp, t_instruct *instruct);
+void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
+void		start_parsing(char *buffer, char **envp, t_instruct *instruct);
 void		exe_command(char *command, char **envp, t_instruct *ins);
 int			exe_builtin(char **cmd, char **envp);
+int			is_valid_char(char c);
 
+char		**get_paths(char **envp);
+char		*try_path(char **strs, char *str);
+
+void		free_instruct(t_instruct *tab);
 t_instruct	init_tabinstruct(char *str, char **envp);
+int			verif_instruct(char *str);
 
+// Utils
+int			ft_strlen(char *s);
 int			ft_strcmp(char *s1, char *s2);
 int			ft_strncmp(char *s1, char *s2, unsigned int n);
 char		*ft_strdup(char *src);
-void		ft_putstr_fd(char *str, int fd);
 char		*ft_substr(char *s, int start, int len);
+char		*ft_strjoin(char *s1, char *s2, int do_free);
+void		ft_putstr_fd(char *str, int fd);
+void		ft_puterror(char *s);
+void		ft_putferror(char *s, char *arg);
 void		tab_free(char **strs);
 char		**ft_split(char *s, char c);
-char		*ft_strjoin(char *s1, char *s2, int do_free);
-int			ft_strlen(char *s);
 
 #endif

@@ -6,13 +6,36 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 10:46:51 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/13 16:27:15 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/15 16:53:23 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	print_header(void)
+static void	exe_command_quick(char *command, char **envp)
+{
+	char	**paths;
+	pid_t	p;
+
+	paths = get_paths(envp);
+	command = try_path(paths, command);
+	tab_free(paths);
+	if (!command)
+		return ;
+	else
+	{
+		p = fork();
+		if (p < 0)
+			ft_puterror("fork: unable to create fork\n");
+		if (p == 0)
+			execve(command, &command, envp);
+		if (p > 0)
+			waitpid(p, NULL, 0);
+	}
+	free(command);
+}
+
+static void	print_header(void)
 {
 	printf("            _       _     _          _ _\n");
 	printf("           (_)     (_)   | |        | | |\n");
@@ -23,7 +46,7 @@ void	print_header(void)
 	printf("             by minishlags\n\n");
 }
 
-void	ctrlc_used(int sigid)
+static void	signal_ctrlc(int sigid)
 {
 	(void)sigid;
 	rl_replace_line("", 0);
@@ -32,32 +55,43 @@ void	ctrlc_used(int sigid)
 	rl_redisplay();
 }
 
+static void	signal_init(void)
+{
+	struct sigaction	ctrl_c;
+
+	signal(SIGINT, SIG_IGN);
+	sigemptyset(&ctrl_c.sa_mask);
+	ctrl_c.sa_handler = signal_ctrlc;
+	ctrl_c.sa_flags = 0;
+	sigaction(SIGINT, &ctrl_c, NULL);
+	signal(SIGQUIT, SIG_IGN);
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	char				*line;
-	struct sigaction	ctrl_c;
 	t_instruct			instruct;
-	
+
 	(void)ac;
 	(void)av;
-	ctrl_c.sa_handler = ctrlc_used;
-	ctrl_c.sa_flags = 0;
-	sigemptyset(&ctrl_c.sa_mask);
-	signal(SIGINT, SIG_IGN);
-	sigaction(SIGINT, &ctrl_c, NULL);
-	signal(SIGQUIT, SIG_IGN);
-	exe_command("clear", envp, NULL);
+	exe_command_quick("clear", envp);
+	signal_init();
 	print_header();
 	line = readline("minishell$ ");
 	while (line && ft_strcmp(line, "exit"))
 	{
-		instruct = init_tabinstruct(line, envp);
-		parse_buffer(line, envp, &instruct);
-		add_history(line);
-		if (!ft_strcmp(line, "clear"))
-			print_header();
+		if (verif_instruct(line))
+		{
+			instruct = init_tabinstruct(line, envp);
+			start_parsing(line, envp, &instruct);
+			add_history(line);
+			if (!ft_strcmp(line, "clear"))
+				print_header();
+			free_instruct(&instruct);
+		}
 		free(line);
 		line = readline("minishell$ ");
 	}
+	printf("\n");
 	free(line);
 }

@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 14:05:03 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/12 15:24:56 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/15 14:13:02 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,21 +53,51 @@ void	ft_echo(char **cmd)
 		printf("\n");
 }
 
+void	ft_cd(char **cmd)
+{
+	DIR	*dest_dir;
+
+	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))
+		chdir(getenv("HOME"));
+	else if (cmd[1])
+	{
+		dest_dir = opendir(cmd[1]);
+		if (access(cmd[1], F_OK))
+			ft_putferror("%s: no such file or directory\n", cmd[1]);
+		else if (!dest_dir)
+			ft_putferror("%s: not a directory\n", cmd[1]);
+		else
+			chdir(cmd[1]);
+		if (dest_dir)
+			closedir(dest_dir);
+	}
+}
+
+void	ft_unset(char **cmd)
+{
+	if (!cmd[1])
+		ft_puterror("unset: not enough arguments\n");
+}
+
 int	exe_builtin(char **cmd, char **envp)
 {
-	(void)envp;
+	int	i;
+
+	i = -1;
+	while (cmd[++i])
+		printf("[%s]", cmd[i]);
+	printf("\n");
 	if (!ft_strcmp(cmd[0], "pwd"))
-		return (ft_pwd_env(0, NULL), 0);
+		return (ft_pwd_env(0, NULL), tab_free(cmd), 0);
 	if (!ft_strcmp(cmd[0], "env"))
-		return (ft_pwd_env(1, envp), 0);
+		return (ft_pwd_env(1, envp), tab_free(cmd), 0);
 	if (!ft_strcmp(cmd[0], "echo"))
-		return (ft_echo(cmd), 0);
+		return (ft_echo(cmd), tab_free(cmd), 0);
 	if (!ft_strcmp(cmd[0], "cd"))
-		return (printf("builtin command!\n"), 0);
-	if (!ft_strcmp(cmd[0], "export")
-		|| !ft_strcmp(cmd[0], "unset"))
-	{
-		return (printf("builtin command!\n"), 0);	
-	}
+		return (ft_cd(cmd), tab_free(cmd), 0);
+	if (!ft_strcmp(cmd[0], "unset"))
+		return (ft_unset(cmd), tab_free(cmd), 0);
+	if (!ft_strcmp(cmd[0], "export"))
+		return (printf("TODO\n"), tab_free(cmd), 0);
 	return (1);
 }
