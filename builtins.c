@@ -3,25 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 14:05:03 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/15 14:13:02 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/18 17:14:22 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_pwd_env(int env, char **envp)
+void	ft_pwd_env(char **cmd, char **envp)
 {
 	int		i;
 	char	*path;
 
-	if (!env)
+	if (!ft_strcmp(cmd[0], "pwd"))
 	{
-		path = getcwd(NULL, 0);
-		printf("%s\n", path);
-		free(path);
+		if (cmd[1])
+			ft_puterror("pwd: too many arguments\n");
+		else
+		{
+			path = getcwd(NULL, 0);
+			printf("%s\n", path);
+			free(path);
+		}
 	}
 	else
 	{
@@ -59,13 +64,15 @@ void	ft_cd(char **cmd)
 
 	if (!cmd[1] || !ft_strcmp(cmd[1], "~"))
 		chdir(getenv("HOME"));
+	else if (!ft_strcmp(cmd[1], ""))
+		return ;
 	else if (cmd[1])
 	{
 		dest_dir = opendir(cmd[1]);
 		if (access(cmd[1], F_OK))
 			ft_putferror("%s: no such file or directory\n", cmd[1]);
 		else if (!dest_dir)
-			ft_putferror("%s: not a directory\n", cmd[1]);
+			ft_putferror("%s: not a directory or permission denied\n", cmd[1]);
 		else
 			chdir(cmd[1]);
 		if (dest_dir)
@@ -73,30 +80,86 @@ void	ft_cd(char **cmd)
 	}
 }
 
-void	ft_unset(char **cmd)
+char	*ft_getenv(char *var, char **envp)
 {
+	char	*path;
+	char	*tmp;
+	int		i;
+	int		j;
+	int		k;
+
+	path = ft_strjoin(var, "=", 0);
+	i = -1;
+	k = ft_strlen(path);
+	while (envp[++i])
+	{
+		if (!ft_strncmp(path, envp[i], k))
+		{
+			j = k - 1;
+			while (envp[i][++j])
+			{
+				if (envp[i][j] == '"')
+					while (envp[i][++j] != '"')
+						tmp[i - k - 1] = envp[i][j];
+				tmp[i - k - 1] = envp[i][j];
+			}
+			return (free(path), tmp);
+		}
+	}
+	return (free(path), NULL);
+}
+
+int	find_var(char **envp, char *var_name)
+{
+	int	i;
+	int	len;
+
+	i = -1;
+	len = ft_strlen(var_name);
+	while (envp[++i])
+	{
+		if (!ft_strncmp(envp[i], var_name, len))
+			return (i);
+	}
+	return (-1);
+}
+
+void	ft_unset(char **cmd, char **envp)
+{
+	int		indice;
+	int		i;
+	char	**tab;
+
 	if (!cmd[1])
 		ft_puterror("unset: not enough arguments\n");
+	if (getenv(cmd[1]))
+	{
+		indice = find_var(envp, cmd[1]);
+		i = -1;
+		while (envp[++i])
+			continue ;
+		tab = malloc (i * sizeof(char));
+		i = -1;
+		while (++i < indice)
+			tab[i] = ft_strdup(envp[i]);
+		while (envp[++i])
+			tab[i - 1] = ft_strdup(envp[i]);
+		tab[i - 1] = NULL;
+		tab_free(envp);
+		envp = tab;
+	}
 }
 
 int	exe_builtin(char **cmd, char **envp)
 {
-	int	i;
-
-	i = -1;
-	while (cmd[++i])
-		printf("[%s]", cmd[i]);
-	printf("\n");
-	if (!ft_strcmp(cmd[0], "pwd"))
-		return (ft_pwd_env(0, NULL), tab_free(cmd), 0);
-	if (!ft_strcmp(cmd[0], "env"))
-		return (ft_pwd_env(1, envp), tab_free(cmd), 0);
+	if (!ft_strcmp(cmd[0], "pwd") || !ft_strcmp(cmd[0], "env"))
+		return (ft_pwd_env(cmd, envp), tab_free(cmd), 0);
 	if (!ft_strcmp(cmd[0], "echo"))
 		return (ft_echo(cmd), tab_free(cmd), 0);
 	if (!ft_strcmp(cmd[0], "cd"))
 		return (ft_cd(cmd), tab_free(cmd), 0);
 	if (!ft_strcmp(cmd[0], "unset"))
-		return (ft_unset(cmd), tab_free(cmd), 0);
+		return (ft_unset(cmd, envp), tab_free(cmd), 0);
 	if (!ft_strcmp(cmd[0], "export"))
 		return (printf("TODO\n"), tab_free(cmd), 0);
 	return (1);

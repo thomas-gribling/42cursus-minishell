@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/15 15:37:48 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/18 11:08:47 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,15 @@
 # define PIPE 1
 # define REDIRECT_I 2
 # define REDIRECT_O 3
-# define HEARDOC_I 4
-# define HEARDOC_O 5
+# define HEREDOC_I 4
+# define HEREDOC_O 5
 
 typedef struct s_instruct
 {
 	int		size;
 	int		ind;
 	int		*i_tab;
+	int		*var_tab;
 	int		**pipes;
 	char	**envp;
 }			t_instruct;
@@ -70,6 +71,8 @@ void		ft_putstr_fd(char *str, int fd);
 void		ft_puterror(char *s);
 void		ft_putferror(char *s, char *arg);
 void		tab_free(char **strs);
+char		*str_append(char *old, char c);
+
 char		**ft_split(char *s, char c);
 
 #endif
