@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 14:36:14 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/18 14:37:48 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/19 10:48:52 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,4 +106,6 @@ void	start_parsing(char *buffer, char **envp, t_instruct *instruct)
 		exe_command(tmp, envp, instruct);
 		free(tmp);
 	}
+	close_all_pipes(instruct, 1, 0);
+	waitpid(instruct->p, NULL, 0);
 }

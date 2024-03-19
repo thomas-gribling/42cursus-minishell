@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 10:46:51 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/15 16:53:23 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/19 09:59:41 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,19 +71,21 @@ int	main(int ac, char **av, char **envp)
 {
 	char				*line;
 	t_instruct			instruct;
+	char				**new_envp;
 
 	(void)ac;
 	(void)av;
-	exe_command_quick("clear", envp);
 	signal_init();
+	new_envp = tab_dup(envp, 0);
+	exe_command_quick("clear", new_envp);
 	print_header();
 	line = readline("minishell$ ");
 	while (line && ft_strcmp(line, "exit"))
 	{
-		if (verif_instruct(line))
+		if (verif_instruct(line) && ft_strcmp(line, ""))
 		{
-			instruct = init_tabinstruct(line, envp);
-			start_parsing(line, envp, &instruct);
+			instruct = init_tabinstruct(line, new_envp);
+			start_parsing(line, new_envp, &instruct);
 			add_history(line);
 			if (!ft_strcmp(line, "clear"))
 				print_header();
@@ -94,4 +96,5 @@ int	main(int ac, char **av, char **envp)
 	}
 	printf("\n");
 	free(line);
+	tab_free(new_envp);
 }

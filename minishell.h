@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/18 11:08:47 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/19 10:40:40 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@
 
 typedef struct s_instruct
 {
+	pid_t	p;
 	int		size;
 	int		ind;
 	int		*i_tab;
@@ -51,6 +52,7 @@ void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
 void		start_parsing(char *buffer, char **envp, t_instruct *instruct);
 void		exe_command(char *command, char **envp, t_instruct *ins);
 int			exe_builtin(char **cmd, char **envp);
+char		*replace_root(char *old);
 int			is_valid_char(char c);
 
 char		**get_paths(char **envp);
@@ -72,6 +74,7 @@ void		ft_puterror(char *s);
 void		ft_putferror(char *s, char *arg);
 void		tab_free(char **strs);
 char		*str_append(char *old, char c);
+char		**tab_dup(char **tab, int start);
 
 char		**ft_split(char *s, char c);
 

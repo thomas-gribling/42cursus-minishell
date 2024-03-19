@@ -133,11 +133,8 @@ int	check_string(char *str, int i, int opened)
 		{
 			if (!opened)
 				opened = str[i];
-			while (str[i] && str[i] != opened)
-				i++;
-			if (!str[i])
-				return (ft_puterror("minishell: unclosed quotes\n"), 0);
-			opened = 0;
+			else if (str[i] == opened)
+				opened = 0;
 		}
 		if (str[i] == '|' && !opened)
 		{
@@ -146,9 +143,11 @@ int	check_string(char *str, int i, int opened)
 			if (str[i] == '|' || !str[i])
 				return (ft_puterror("minishell: parse error near `|'\n"), 0);
 		}
-		if (str[i] == '&')
+		if (str[i] == '&' && !opened)
 			return (ft_puterror("minishell: parse error near `&'\n"), 0);
 	}
+	if (opened)
+		return (ft_puterror("minishell: unclosed quotes\n"), 0);
 	return (1);
 }
 
@@ -165,7 +164,7 @@ int	verif_instruct(char *str)
 		return (ft_puterror("minishell: parse error near `|'\n"), 0);
 	if (str[i] == '&')
 		return (ft_puterror("minishell: parse error near `&'\n"), 0);
-	if (str[i] == '\'' || str[i] == '"')
+	if ((str[i] == '\'' || str[i] == '"') && !opened)
 		opened = str[i];
 	return (check_string(str, i, opened));
 }

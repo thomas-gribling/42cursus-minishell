@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:28:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/18 10:03:25 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/19 10:42:05 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,24 +59,21 @@ void	dup_fds(t_instruct *ins, int do_pipe)
 
 int	ft_execve(char *path, char **argv, t_instruct *ins, int do_pipe)
 {
-	pid_t	p;
 	char	**envp;
 
-	(void)do_pipe;
 	if (ins)
 		envp = ins->envp;
 	else
 		envp = NULL;
-	p = fork();
-	if (p < 0)
+	ins->p = fork();
+	if (ins->p < 0)
 		return (ft_puterror("fork: unable to create fork\n"), 1);
-	if (p == 0)
+	if (ins->p == 0)
 	{
 		dup_fds(ins, do_pipe);
 		execve(path, argv, envp);
+		exit(1);
 	}
-	if (p > 0)
-		waitpid(p, NULL, 0);
 	return (0);
 }
 
@@ -117,7 +114,15 @@ void	exe_command(char *command, char **envp, t_instruct *ins)
 	cmd_err = ft_strdup(cmd[0]);
 	if (cmd[0][0] == '/' || (cmd[0][0] == '.' && cmd[0][1] == '/')
 		|| (cmd[0][0] == '~' && cmd[0][1] == '/'))
-		call_ft_execve(cmd, ins);
+	{
+		cmd[0] = replace_root(cmd[0]);
+		if (access(cmd[0], F_OK))
+			ft_putferror("%s: no such file or directory\n", cmd_err);
+		else if ((access(cmd[0], X_OK)))
+			ft_putferror("%s: permission denied\n", cmd_err);
+		else
+			call_ft_execve(cmd, ins);
+	}
 	else
 	{
 		paths = get_paths(envp);
