@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/19 10:40:40 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/19 14:12:35 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,18 @@ typedef struct s_instruct
 	char	**envp;
 }			t_instruct;
 
-void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
 void		start_parsing(char *buffer, char **envp, t_instruct *instruct);
+
 void		exe_command(char *command, char **envp, t_instruct *ins);
-int			exe_builtin(char **cmd, char **envp);
+int			exe_builtin(t_instruct *ins, char **cmd, char **envp);
+void		dup_fds(t_instruct *ins, int do_pipe);
+void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
+
 char		*replace_root(char *old);
 int			is_valid_char(char c);
+
+char		*ft_getenv(char *var, char **envp);
+void		ft_unset(char **cmd, char **envp);
 
 char		**get_paths(char **envp);
 char		*try_path(char **strs, char *str);

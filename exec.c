@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:28:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/19 10:42:05 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/19 13:09:30 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ void	exe_command(char *command, char **envp, t_instruct *ins)
 	char	*cmd_err;
 
 	cmd = ft_split(command, ' ');
-	if (!cmd || !exe_builtin(cmd, envp))
+	if (!cmd || !exe_builtin(ins, cmd, envp))
 		return ;
 	cmd_err = ft_strdup(cmd[0]);
 	if (cmd[0][0] == '/' || (cmd[0][0] == '.' && cmd[0][1] == '/')

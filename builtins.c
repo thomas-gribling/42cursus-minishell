@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 14:05:03 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/19 10:13:26 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/19 14:15:28 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,88 +104,68 @@ void	ft_cd(char **cmd)
 	}
 }
 
-char	*ft_getenv(char *var, char **envp)
+int	is_builtin(char *cmd)
 {
-	char	*path;
-	char	*tmp;
-	int		i;
-	int		j;
-	int		k;
-
-	path = ft_strjoin(var, "=", 0);
-	i = -1;
-	k = ft_strlen(path);
-	tmp = malloc(sizeof(int)); // TODO
-	while (envp[++i])
-	{
-		if (!ft_strncmp(path, envp[i], k))
-		{
-			j = k - 1;
-			while (envp[i][++j])
-			{
-				if (envp[i][j] == '"')
-					while (envp[i][++j] != '"')
-						tmp[i - k - 1] = envp[i][j];
-				tmp[i - k - 1] = envp[i][j];
-			}
-			return (free(path), tmp);
-		}
-	}
-	return (free(path), NULL);
-}
-
-int	find_var(char **envp, char *var_name)
-{
-	int	i;
-	int	len;
-
-	i = -1;
-	len = ft_strlen(var_name);
-	while (envp[++i])
-	{
-		if (!ft_strncmp(envp[i], var_name, len))
-			return (i);
-	}
-	return (-1);
-}
-
-void	ft_unset(char **cmd, char **envp)
-{
-	int		indice;
-	int		i;
-	char	**tab;
-
-	if (!cmd[1])
-		ft_puterror("unset: not enough arguments\n");
-	if (getenv(cmd[1]))
-	{
-		indice = find_var(envp, cmd[1]);
-		i = -1;
-		while (envp[++i])
-			continue ;
-		tab = malloc (i * sizeof(char));
-		i = -1;
-		while (++i < indice)
-			tab[i] = ft_strdup(envp[i]);
-		while (envp[++i])
-			tab[i - 1] = ft_strdup(envp[i]);
-		tab[i - 1] = NULL;
-		tab_free(envp);
-		envp = tab;
-	}
-}
-
-int	exe_builtin(char **cmd, char **envp)
-{
-	if (!ft_strcmp(cmd[0], "pwd") || !ft_strcmp(cmd[0], "env"))
-		return (ft_pwd_env(cmd, envp), tab_free(cmd), 0);
-	if (!ft_strcmp(cmd[0], "echo"))
-		return (ft_echo(cmd), tab_free(cmd), 0);
-	if (!ft_strcmp(cmd[0], "cd"))
-		return (ft_cd(cmd), tab_free(cmd), 0);
-	if (!ft_strcmp(cmd[0], "unset"))
-		return (ft_unset(cmd, envp), tab_free(cmd), 0);
-	if (!ft_strcmp(cmd[0], "export"))
-		return (printf("TODO\n"), tab_free(cmd), 0);
+	if (ft_strcmp(cmd, "pwd"))
+		if (ft_strcmp(cmd, "env"))
+			if (ft_strcmp(cmd, "echo"))
+				if (ft_strcmp(cmd, "cd"))
+					if (ft_strcmp(cmd, "unset"))
+						if (ft_strcmp(cmd, "export"))
+							return (0);
 	return (1);
+}
+
+void	call_builtin(t_instruct *ins)
+{
+	int	ind;
+
+	if (ins)
+		ind = ins->ind;
+	if (ins->ind > ins->size || ins->ind < 0)
+		return ;
+	if (ins && ind <= ins->size)
+	{
+		if (!ind && !ins->size)
+			dup_fds(ins, 0);
+		if (!ind && ins->i_tab[ind] == PIPE)
+			dup_fds(ins, 2);
+		if (ind && ins->i_tab[ind - 1] == PIPE && ins->i_tab[ind] != PIPE)
+			dup_fds(ins, 1);
+		if (ind && ins->i_tab[ind - 1] != PIPE && ins->i_tab[ind] == PIPE)
+			dup_fds(ins, 2);
+		if (ind && ins->i_tab[ind - 1] == PIPE && ins->i_tab[ind] == PIPE)
+			dup_fds(ins, 3);
+	}
+	else
+		dup_fds(ins, 0);
+}
+
+int	exe_builtin(t_instruct *ins, char **cmd, char **envp)
+{
+	if (!is_builtin(cmd[0]))
+		return (1);
+	ins->p = fork();
+	if (ins->p < 0)
+		return (ft_puterror("fork: unable to create fork\n"), 1);
+	if (ins->p == 0)
+	{
+		call_builtin(ins);
+		if (!ft_strcmp(cmd[0], "pwd") || !ft_strcmp(cmd[0], "env"))
+			ft_pwd_env(cmd, envp);
+		if (!ft_strcmp(cmd[0], "echo"))
+			ft_echo(cmd);
+		if (!ft_strcmp(cmd[0], "cd"))
+			ft_cd(cmd);
+		tab_free(cmd);
+		exit(0);
+	}
+	if (ins->p > 0)
+	{
+		if (!ft_strcmp(cmd[0], "unset"))
+			ft_unset(cmd, envp);
+		if (!ft_strcmp(cmd[0], "export"))
+			printf("TODO\n");
+	}
+	return (0);
 }

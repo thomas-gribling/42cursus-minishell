@@ -7,7 +7,8 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
 FILES = main.c parsing.c instruct.c paths.c exec.c \
-		builtins.c utils_1.c utils_2.c utils_3.c ft_split.c
+		builtins.c utils_1.c utils_2.c utils_3.c ft_split.c \
+		builtins_env.c
 OBJECTS = $(addprefix $(SRCS), $(FILES:.c=.o))
 
 %.o: %.c
