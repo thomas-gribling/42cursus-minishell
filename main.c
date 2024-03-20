@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 10:46:51 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/19 09:59:41 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/20 14:52:46 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ static void	exe_command_quick(char *command, char **envp)
 	{
 		p = fork();
 		if (p < 0)
-			ft_puterror("fork: unable to create fork\n");
+			ft_putferror(ERR_CREATE, "fork");
 		if (p == 0)
 			execve(command, &command, envp);
 		if (p > 0)
@@ -37,13 +37,15 @@ static void	exe_command_quick(char *command, char **envp)
 
 static void	print_header(void)
 {
+	printf("%s ========================================\n", WHITE);
 	printf("            _       _     _          _ _\n");
 	printf("           (_)     (_)   | |        | | |\n");
 	printf("  _ __ ___  _ _ __  _ ___| |__   ___| | |\n");
 	printf(" | '_ ` _ \\| | '_ \\| / __| '_ \\ / _ \\ | |\n");
 	printf(" | | | | | | | | | | \\__ \\ | | |  __/ | |\n");
 	printf(" |_| |_| |_|_|_| |_|_|___/_| |_|\\___|_|_|\n");
-	printf("             by minishlags\n\n");
+	printf("             by minishlags\n");
+	printf(" ========================================%s\n\n", RESET);
 }
 
 static void	signal_ctrlc(int sigid)
@@ -79,8 +81,8 @@ int	main(int ac, char **av, char **envp)
 	new_envp = tab_dup(envp, 0);
 	exe_command_quick("clear", new_envp);
 	print_header();
-	line = readline("minishell$ ");
-	while (line && ft_strcmp(line, "exit"))
+	line = readline(PROMPT);
+	while (line && ft_strncmp(line, "exit", 4))
 	{
 		if (verif_instruct(line) && ft_strcmp(line, ""))
 		{
@@ -92,7 +94,7 @@ int	main(int ac, char **av, char **envp)
 			free_instruct(&instruct);
 		}
 		free(line);
-		line = readline("minishell$ ");
+		line = readline(PROMPT);
 	}
 	printf("\n");
 	free(line);

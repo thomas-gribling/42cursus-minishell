@@ -6,7 +6,7 @@
 /*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/19 14:12:35 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/20 14:30:05 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,22 @@
 # define HEREDOC_I 4
 # define HEREDOC_O 5
 
+# define LIME "\033[0;92m"
+# define SKY_BLUE "\033[0;96m"
+# define RESET "\033[0m"
+# define WHITE "\033[1;37m"
+# define PROMPT LIME "➜  " SKY_BLUE "minishell" RESET " " WHITE
+
+# define ERR_NOCMD "%s: command not found\n"
+# define ERR_NOFILE "%s: no such file or directory\n"
+# define ERR_NOPERM "%s: permission denied\n"
+# define ERR_NODIRPERM "%s: not a directory or permission denied\n"
+# define ERR_CREATE	 "%s: unable to create %s\n"
+# define ERR_NEARGS "%s: not enough arguments\n"
+# define ERR_TMARGS "%s: too many arguments\n"
+# define ERR_PARSE "minishell: parse error near `%s'\n"
+# define ERR_UNCLOSED "minishell: unclosed %s detected\n"
+
 typedef struct s_instruct
 {
 	pid_t	p;
@@ -55,9 +71,11 @@ int			exe_builtin(t_instruct *ins, char **cmd, char **envp);
 void		dup_fds(t_instruct *ins, int do_pipe);
 void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
 
-char		*replace_root(char *old);
 int			is_valid_char(char c);
 
+void		update_pwd(char **envp);
+void		ft_export(char **envp, char *new_var);
+int			find_var(char **envp, char *var_name);
 char		*ft_getenv(char *var, char **envp);
 void		ft_unset(char **cmd, char **envp);
 

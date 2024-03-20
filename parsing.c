@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 14:36:14 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/19 10:48:52 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/20 15:18:35 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int	parse_buffer(char *buffer, char **envp, t_instruct *instruct, int *i)
 	return (start);
 }
 
-void	replace_var(char *old, char *new, int *i)
+void	replace_var(char *old, char **new, int *i, char **envp)
 {
 	int		start;
 	char	*temp1;
@@ -59,18 +59,19 @@ void	replace_var(char *old, char *new, int *i)
 		&& old[*i] != '"' && old[*i] != ' ' && old[*i])
 		continue ;
 	temp1 = ft_substr(old, start + 1, *i - start - 1);
-	temp2 = getenv(temp1);
+	temp2 = ft_getenv(temp1, envp);
 	free(temp1);
 	if (temp2)
 	{
 		start = -1;
 		while (temp2[++start])
-			new = str_append(new, temp2[start]);
+			*new = str_append(*new, temp2[start]);
 	}
+	free(temp2);
 	(*i)--;
 }
 
-char	*replace_vars(t_instruct *ins, char *old)
+char	*replace_vars(t_instruct *ins, char *old, char **envp)
 {
 	int		i;
 	int		ind;
@@ -82,7 +83,45 @@ char	*replace_vars(t_instruct *ins, char *old)
 	while (old[++i])
 	{
 		if (old[i] == '$' && ins->var_tab[++ind])
-			replace_var(old, new, &i);
+			replace_var(old, &new, &i, envp);
+		else
+			new = str_append(new, old[i]);
+	}
+	return (new);
+}
+
+void	replace_root(char **buffer, char **envp)
+{
+	int		j;
+	char	*home;
+
+	j = -1;
+	home = ft_getenv("HOME", envp);
+	while (home[++j])
+		*buffer = str_append(*buffer, home[j]);
+	free(home);
+}
+
+char	*replace_roots(char *old, char **envp)
+{
+	int		i;
+	int		opened;
+	char	*new;
+
+	i = -1;
+	opened = 0;
+	new = NULL;
+	while (old[++i])
+	{
+		if (old[i] == '\'' || old[i] == '"')
+		{
+			if (!opened)
+				opened = old[i];
+			else if (opened == old[i])
+				opened = 0;
+		}
+		if (!opened && old[i] == '~' && (i == 0 || old[i - 1] == ' '))
+			replace_root(&new, envp);
 		else
 			new = str_append(new, old[i]);
 	}
@@ -97,7 +136,8 @@ void	start_parsing(char *buffer, char **envp, t_instruct *instruct)
 
 	i = -1;
 	instruct->ind = -1;
-	buffer = replace_vars(instruct, buffer);
+	buffer = replace_vars(instruct, buffer, envp);
+	buffer = replace_roots(buffer, envp);
 	start = parse_buffer(buffer, envp, instruct, &i);
 	if (start != i)
 	{
@@ -107,5 +147,6 @@ void	start_parsing(char *buffer, char **envp, t_instruct *instruct)
 		free(tmp);
 	}
 	close_all_pipes(instruct, 1, 0);
-	waitpid(instruct->p, NULL, 0);
+	if (strncmp(buffer, "cd", 2) && strncmp(buffer, "unset", 5))
+		waitpid(instruct->p, NULL, 0);
 }

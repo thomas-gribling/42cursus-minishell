@@ -22,7 +22,7 @@ void	pipes_init(t_instruct *instruct)
 	{
 		instruct->pipes[i] = malloc(sizeof(int) * 2);
 		if (pipe(instruct->pipes[i]) < 0)
-			ft_puterror("pipe: unable to create pipe\n");
+			ft_putferror(ERR_CREATE, "pipe");
 	}
 }
 
@@ -125,7 +125,7 @@ void	free_instruct(t_instruct *tab)
 	free(tab->pipes);
 }
 
-int	check_string(char *str, int i, int opened)
+int	check_string(char *str, int i, char opened)
 {
 	while (str[++i])
 	{
@@ -141,13 +141,13 @@ int	check_string(char *str, int i, int opened)
 			while (str[++i] == ' ')
 				continue ;
 			if (str[i] == '|' || !str[i])
-				return (ft_puterror("minishell: parse error near `|'\n"), 0);
+				return (ft_putferror(ERR_PARSE, "|"), 0);
 		}
 		if (str[i] == '&' && !opened)
-			return (ft_puterror("minishell: parse error near `&'\n"), 0);
+			return (ft_putferror(ERR_PARSE, "&"), 0);
 	}
 	if (opened)
-		return (ft_puterror("minishell: unclosed quotes\n"), 0);
+		return (ft_putferror(ERR_UNCLOSED, "quotes"), 0);
 	return (1);
 }
 
@@ -161,9 +161,9 @@ int	verif_instruct(char *str)
 	while (str[++i] == ' ')
 		continue ;
 	if (str[i] == '|')
-		return (ft_puterror("minishell: parse error near `|'\n"), 0);
+		return (ft_putferror(ERR_PARSE, "|"), 0);
 	if (str[i] == '&')
-		return (ft_puterror("minishell: parse error near `&'\n"), 0);
+		return (ft_putferror(ERR_PARSE, "&"), 0);
 	if ((str[i] == '\'' || str[i] == '"') && !opened)
 		opened = str[i];
 	return (check_string(str, i, opened));
