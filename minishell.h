@@ -6,7 +6,7 @@
 /*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/20 14:30:05 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/21 16:27:05 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@
 # define LIME "\033[0;92m"
 # define SKY_BLUE "\033[0;96m"
 # define RESET "\033[0m"
-# define WHITE "\033[1;37m"
-# define PROMPT LIME "➜  " SKY_BLUE "minishell" RESET " " WHITE
+# define WHITE "\033[0;37m"
+# define PROMPT LIME "➜  " SKY_BLUE "minishell" RESET " "
 
 # define ERR_NOCMD "%s: command not found\n"
 # define ERR_NOFILE "%s: no such file or directory\n"
@@ -64,26 +64,29 @@ typedef struct s_instruct
 	char	**envp;
 }			t_instruct;
 
-void		start_parsing(char *buffer, char **envp, t_instruct *instruct);
+extern char	**g_envp;
 
-void		exe_command(char *command, char **envp, t_instruct *ins);
-int			exe_builtin(t_instruct *ins, char **cmd, char **envp);
+void		start_parsing(char *buffer, t_instruct *instruct);
+
+void		exe_command(char *command, t_instruct *ins);
+int			exe_builtin(t_instruct *ins, char **cmd);
 void		dup_fds(t_instruct *ins, int do_pipe);
 void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
 
 int			is_valid_char(char c);
 
-void		update_pwd(char **envp);
-void		ft_export(char **envp, char *new_var);
-int			find_var(char **envp, char *var_name);
-char		*ft_getenv(char *var, char **envp);
-void		ft_unset(char **cmd, char **envp);
+void		update_pwd(void);
+void		ft_export(char *new_var);
+int			find_var(char *var_name);
+void		ft_unset_export(char **cmd);
+char		*ft_getenv(char *var);
+void		ft_unset(char *cmd);
 
-char		**get_paths(char **envp);
+char		**get_paths(void);
 char		*try_path(char **strs, char *str);
 
 void		free_instruct(t_instruct *tab);
-t_instruct	init_tabinstruct(char *str, char **envp);
+t_instruct	init_tabinstruct(char *str);
 int			verif_instruct(char *str);
 
 // Utils

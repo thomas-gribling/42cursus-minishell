@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:28:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/20 09:18:08 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/21 15:29:34 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,19 +59,13 @@ void	dup_fds(t_instruct *ins, int do_pipe)
 
 int	ft_execve(char *path, char **argv, t_instruct *ins, int do_pipe)
 {
-	char	**envp;
-
-	if (ins)
-		envp = ins->envp;
-	else
-		envp = NULL;
 	ins->p = fork();
 	if (ins->p < 0)
 		return (ft_putferror(ERR_CREATE, "fork"), 1);
 	if (ins->p == 0)
 	{
 		dup_fds(ins, do_pipe);
-		execve(path, argv, envp);
+		execve(path, argv, g_envp);
 		exit(1);
 	}
 	return (0);
@@ -102,14 +96,14 @@ void	call_ft_execve(char **cmd, t_instruct *ins)
 		ft_execve(cmd[0], cmd, ins, 0);
 }
 
-void	exe_command(char *command, char **envp, t_instruct *ins)
+void	exe_command(char *command, t_instruct *ins)
 {
 	char	**paths;
 	char	**cmd;
 	char	*cmd_err;
 
 	cmd = ft_split(command, ' ');
-	if (!cmd || !exe_builtin(ins, cmd, envp))
+	if (!cmd || !exe_builtin(ins, cmd))
 		return ;
 	cmd_err = ft_strdup(cmd[0]);
 	if (cmd[0][0] == '/' || (cmd[0][0] == '.' && cmd[0][1] == '/')
@@ -124,7 +118,7 @@ void	exe_command(char *command, char **envp, t_instruct *ins)
 	}
 	else
 	{
-		paths = get_paths(envp);
+		paths = get_paths();
 		cmd[0] = try_path(paths, cmd[0]);
 		tab_free(paths);
 		if (!cmd[0])

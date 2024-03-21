@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 14:05:03 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/20 14:55:00 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/21 16:27:37 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ int	ft_pwd(char *arg)
 	return (0);
 }
 
-void	ft_pwd_env(char **cmd, char **envp, t_instruct *ins)
+void	ft_pwd_env(char **cmd, t_instruct *ins)
 {
 	int		i;
 
@@ -74,8 +74,8 @@ void	ft_pwd_env(char **cmd, char **envp, t_instruct *ins)
 		exit(1);
 	}
 	else
-		while (envp[++i])
-			printf("%s\n", envp[i]);
+		while (g_envp[++i])
+			printf("%s\n", g_envp[i]);
 	exit(0);
 }
 
@@ -111,14 +111,14 @@ void	ft_echo(char **cmd, t_instruct *ins)
 	exit(0);
 }
 
-void	ft_cd(char **cmd, char **envp)
+void	ft_cd(char **cmd)
 {
 	DIR	*dest_dir;
 
 	if (cmd[1] && cmd[2])
 		ft_putferror(ERR_TMARGS, "cd");
 	else if (!cmd[1])
-		chdir(ft_getenv("HOME", envp));
+		chdir(ft_getenv("HOME"));
 	else if (!ft_strcmp(cmd[1], ""))
 		return ;
 	else if (cmd[1])
@@ -132,7 +132,7 @@ void	ft_cd(char **cmd, char **envp)
 			chdir(cmd[1]);
 		if (dest_dir)
 			closedir(dest_dir);
-		update_pwd(envp);
+		update_pwd();
 	}
 }
 
@@ -148,21 +148,19 @@ int	is_builtin(char *cmd)
 	return (1);
 }
 
-int	exe_builtin(t_instruct *ins, char **cmd, char **envp)
+int	exe_builtin(t_instruct *ins, char **cmd)
 {
 	(void)ins;
 	if (!is_builtin(cmd[0]))
 		return (1);
 	if (!ft_strcmp(cmd[0], "pwd") || !ft_strcmp(cmd[0], "env"))
-		ft_pwd_env(cmd, envp, ins);
+		ft_pwd_env(cmd, ins);
 	if (!ft_strcmp(cmd[0], "echo"))
 		ft_echo(cmd, ins);
 	if (!ft_strcmp(cmd[0], "cd"))
-		ft_cd(cmd, envp);
-	if (!ft_strcmp(cmd[0], "unset"))
-		ft_unset(cmd, envp);
-	if (!ft_strcmp(cmd[0], "export"))
-		ft_export(envp, cmd[1]);
+		ft_cd(cmd);
+	if (!ft_strcmp(cmd[0], "unset") || !ft_strcmp(cmd[0], "export"))
+		ft_unset_export(cmd);
 	tab_free(cmd);
 	return (0);
 }

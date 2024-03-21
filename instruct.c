@@ -84,7 +84,7 @@ void	vars_init(t_instruct *instruct, char *str)
 	}
 }
 
-t_instruct	init_tabinstruct(char *str, char **envp)
+t_instruct	init_tabinstruct(char *str)
 {
 	t_instruct	tab;
 	int			i;
@@ -108,7 +108,6 @@ t_instruct	init_tabinstruct(char *str, char **envp)
 	tab.i_tab[++j] = 0;
 	pipes_init(&tab);
 	vars_init(&tab, str);
-	tab.envp = envp;
 	return (tab);
 }
 

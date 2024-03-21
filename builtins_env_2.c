@@ -12,38 +12,83 @@
 
 #include "minishell.h"
 
-void	update_pwd(char **envp)
+void	update_pwd(void)
 {
 	int		indice;
 
-	indice = find_var(envp, "OLDPWD");
+	indice = find_var("OLDPWD");
 	if (indice >= 0)
 	{
-		free(envp[indice]);
-		envp[indice] = ft_strjoin("OLDPWD=", ft_getenv("PWD", envp), 2);
+		free(g_envp[indice]);
+		g_envp[indice] = ft_strjoin("OLDPWD=", ft_getenv("PWD"), 2);
 	}
-	indice = find_var(envp, "PWD");
+	indice = find_var("PWD");
 	if (indice >= 0)
 	{
-		free(envp[indice]);
-		envp[indice] = ft_strjoin("PWD=", getcwd(NULL, 0), 2);
+		free(g_envp[indice]);
+		g_envp[indice] = ft_strjoin("PWD=", getcwd(NULL, 0), 2);
 	}
 }
 
-void	ft_export(char **envp, char *new_var)
+int	find_var_pref(char *new_var)
+{
+	int		i;
+	int		indice;
+	char	*var_name;
+
+	i = -1;
+	while (new_var[++i] && new_var[i] != '=')
+		continue ;
+	var_name = malloc(sizeof(char) * (i + 1));
+	i = -1;
+	while (new_var[++i] && new_var[i] != '=')
+		var_name[i] = new_var[i];
+	var_name[i] = '\0';
+	indice = find_var(var_name);
+	free(var_name);
+	return (indice);
+}
+
+void	ft_unset_export(char **cmd)
+{
+	int	i;
+
+	i = 0;
+	if (cmd[0][0] == 'e')
+	{
+		while (cmd[++i])
+			ft_export(cmd[i]);
+	}
+	else
+	{
+		while (cmd[++i])
+			ft_unset(cmd[i]);
+	}
+}
+
+void	ft_export(char *new_var)
 {
 	int		i;
 	char	**new_envp;
 
-	i = -1;
-	while (envp[++i])
-		continue ;
-	new_envp = malloc((i + 2) * sizeof(char *));
-	i = -1;
-	while (envp[++i])
-		new_envp[i] = ft_strdup(envp[i]);
-	new_envp[i] = ft_strdup(new_var);
-	new_envp[i] = NULL;
-	tab_free(envp);
-	envp = new_envp;
+	i = find_var_pref(new_var);
+	if (i != -1)
+	{
+		free(g_envp[i]);
+		g_envp[i] = ft_strdup(new_var);
+	}
+	else
+	{
+		i = -1;
+		while (g_envp[++i])
+			continue ;
+		new_envp = malloc((i + 2) * sizeof(char *));
+		i = -1;
+		while (g_envp[++i])
+			new_envp[i] = ft_strdup(g_envp[i]);
+		new_envp[i] = ft_strdup(new_var);
+		new_envp[++i] = NULL;
+		tab_free(g_envp);
+		g_envp = new_envp;
+	}
 }

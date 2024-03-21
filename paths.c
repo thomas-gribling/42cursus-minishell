@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   paths.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:29:15 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/15 15:30:13 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/21 15:41:19 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	**get_paths(char **envp)
+char	**get_paths(void)
 {
 	char	**strs;
 	char	*tmp;
@@ -20,9 +20,9 @@ char	**get_paths(char **envp)
 
 	strs = NULL;
 	i = -1;
-	while (envp[++i])
-		if (!ft_strncmp(envp[i], "PATH=", 5))
-			strs = ft_split(envp[i], ':');
+	while (g_envp[++i])
+		if (!ft_strncmp(g_envp[i], "PATH=", 5))
+			strs = ft_split(g_envp[i], ':');
 	tmp = malloc(ft_strlen(strs[0]) - 4);
 	i = 4;
 	while (strs[0][++i])

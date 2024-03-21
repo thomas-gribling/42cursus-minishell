@@ -3,21 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 10:46:51 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/20 14:52:46 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/21 15:56:55 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	exe_command_quick(char *command, char **envp)
+char	**g_envp;
+
+static void	exe_command_quick(char *command)
 {
 	char	**paths;
 	pid_t	p;
 
-	paths = get_paths(envp);
+	paths = get_paths();
 	command = try_path(paths, command);
 	tab_free(paths);
 	if (!command)
@@ -28,7 +30,7 @@ static void	exe_command_quick(char *command, char **envp)
 		if (p < 0)
 			ft_putferror(ERR_CREATE, "fork");
 		if (p == 0)
-			execve(command, &command, envp);
+			execve(command, &command, g_envp);
 		if (p > 0)
 			waitpid(p, NULL, 0);
 	}
@@ -37,7 +39,7 @@ static void	exe_command_quick(char *command, char **envp)
 
 static void	print_header(void)
 {
-	printf("%s ========================================\n", WHITE);
+	printf(" ========================================\n");
 	printf("            _       _     _          _ _\n");
 	printf("           (_)     (_)   | |        | | |\n");
 	printf("  _ __ ___  _ _ __  _ ___| |__   ___| | |\n");
@@ -45,7 +47,7 @@ static void	print_header(void)
 	printf(" | | | | | | | | | | \\__ \\ | | |  __/ | |\n");
 	printf(" |_| |_| |_|_|_| |_|_|___/_| |_|\\___|_|_|\n");
 	printf("             by minishlags\n");
-	printf(" ========================================%s\n\n", RESET);
+	printf(" ========================================\n\n");
 }
 
 static void	signal_ctrlc(int sigid)
@@ -73,21 +75,20 @@ int	main(int ac, char **av, char **envp)
 {
 	char				*line;
 	t_instruct			instruct;
-	char				**new_envp;
 
 	(void)ac;
 	(void)av;
 	signal_init();
-	new_envp = tab_dup(envp, 0);
-	exe_command_quick("clear", new_envp);
+	g_envp = tab_dup(envp, 0);
+	exe_command_quick("clear");
 	print_header();
 	line = readline(PROMPT);
 	while (line && ft_strncmp(line, "exit", 4))
 	{
 		if (verif_instruct(line) && ft_strcmp(line, ""))
 		{
-			instruct = init_tabinstruct(line, new_envp);
-			start_parsing(line, new_envp, &instruct);
+			instruct = init_tabinstruct(line);
+			start_parsing(line, &instruct);
 			add_history(line);
 			if (!ft_strcmp(line, "clear"))
 				print_header();
@@ -98,5 +99,5 @@ int	main(int ac, char **av, char **envp)
 	}
 	printf("\n");
 	free(line);
-	tab_free(new_envp);
+	tab_free(g_envp);
 }
