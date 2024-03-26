@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/25 10:21:19 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/26 16:53:50 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,18 +69,29 @@ typedef struct s_instruct
 	char	**envp;
 }			t_instruct;
 
+typedef struct s_redirect
+{
+	char	***cmds;
+	int		*redirs;
+	int		count;
+}			t_redirect;
+
 extern char	**g_envp;
 
 void		start_parsing(char *buffer, t_instruct *instruct, int *st);
 
 void		exe_command(char *command, t_instruct *ins, int *st);
+int			is_redirect(t_instruct *ins, char *command, int *st);
 int			exe_builtin(t_instruct *ins, char **cmd, int *st);
 void		dup_fds(t_instruct *ins, int do_pipe);
 void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
 
 int			is_valid_char(char c);
 
+void		call_builtin(t_instruct *ins);
 void		ft_pwd_env(char **cmd, t_instruct *ins, int *st);
+void		ft_echo(char **cmd, t_instruct *ins);
+void		ft_cd(char **cmd, int *st);
 void		update_pwd(void);
 void		ft_export(char *new_var);
 int			find_var(char *var_name);
@@ -108,6 +119,7 @@ void		ft_putferror(char *s, char *arg, int *st, int new_st);
 void		tab_free(char **strs);
 char		*str_append(char *old, char c);
 char		**tab_dup(char **tab, int start);
+char		**tab_dup_n(char **tab, int start, int n);
 
 char		**ft_split(char *s, char c);
 char		*ft_itoa(int n);

@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 11:06:39 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/19 08:32:43 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/26 16:47:29 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,22 @@ char	**tab_dup(char **tab, int start)
 	out = malloc((i + 1) * sizeof(char *));
 	i = start - 1;
 	while (tab[++i])
+		out[i - start] = ft_strdup(tab[i]);
+	out[i - start] = NULL;
+	return (out);
+}
+
+char	**tab_dup_n(char **tab, int start, int n)
+{
+	char	**out;
+	int		i;
+
+	i = 0;
+	while (tab[start + i] && i < n)
+		i++;
+	out = malloc((i + 1) * sizeof(char *));
+	i = start - 1;
+	while (tab[++i] && i - start < n)
 		out[i - start] = ft_strdup(tab[i]);
 	out[i - start] = NULL;
 	return (out);

@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 10:46:51 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/25 09:07:12 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/26 08:37:59 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,8 @@ int	main(int ac, char **av, char **envp)
 		free(line);
 		line = readline(PROMPT);
 	}
-	printf("\n");
+	if (!line || ft_strncmp(line, "exit", 4))
+		printf("\n");
 	free(line);
 	tab_free(g_envp);
 }

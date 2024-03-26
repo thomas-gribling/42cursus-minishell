@@ -6,8 +6,8 @@ INCLUDE = ./
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
-FILES = main.c parsing.c instruct.c paths.c exec.c \
-		builtins.c builtins_env_1.c builtins_env_2.c \
+FILES = main.c parsing.c instruct.c paths.c exec.c redirect.c \
+		builtins_1.c builtins_2.c builtins_env_1.c builtins_env_2.c \
 		utils_1.c utils_2.c utils_3.c ft_split.c ft_itoa.c
 OBJECTS = $(addprefix $(SRCS), $(FILES:.c=.o))
 

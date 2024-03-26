@@ -6,7 +6,7 @@
 /*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 14:50:29 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/03/12 14:50:29 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/26 14:42:11 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,49 @@ void	pipes_init(t_instruct *instruct)
 			ft_putferror(ERR_CREATE, "pipe", NULL, 0);
 	}
 }
+
+int	is_redirect_first(char *str, int i)
+{
+	if (str[i] == '<')
+	{
+		if (str[i + 1] == '<')
+			return (HEREDOC_I);
+		return (REDIRECT_I);
+	}
+	if (str[i] == '>')
+	{
+		if (str[i + 1] == '>')
+			return (HEREDOC_O);
+		return (REDIRECT_O);
+	}
+	return (0);
+}
+
+/*int	is_redirect(char *str, int i)
+{
+	if (i == 0)
+		return (is_redirect_first(str, i));
+	else if (str[i] == '<' || str[i] == '>')
+	{
+		if (str[i] == '<')
+		{
+			if (str[i - 1] == '<')
+				return (0);
+			if (str[i + 1] == '<')
+				return (HEREDOC_I);
+			return (REDIRECT_I);
+		}
+		if (str[i] == '>')
+		{
+			if (str[i - 1] == '>')
+				return (0);
+			if (str[i + 1] == '>')
+				return (HEREDOC_O);
+			return (REDIRECT_O);
+		}
+	}
+	return (0);
+}*/
 
 int	is_var_valid(char *str, int i, int opened)
 {
@@ -95,7 +138,7 @@ t_instruct	init_tabinstruct(char *str)
 		return (tab);
 	i = -1;
 	while (str[++i])
-		if (str[i] == '|')
+		if (str[i] == '|')// || is_redirect(str, i))
 			tab.size++;
 	tab.i_tab = malloc(sizeof(int) * (tab.size + 1));
 	j = -1;
@@ -104,6 +147,14 @@ t_instruct	init_tabinstruct(char *str)
 	{
 		if (str[i] == '|')
 			tab.i_tab[++j] = PIPE;
+		/*if (is_redirect(str, i) == HEREDOC_I)
+			tab.i_tab[++j] = HEREDOC_I;
+		if (is_redirect(str, i) == HEREDOC_O)
+			tab.i_tab[++j] = HEREDOC_O;
+		if (is_redirect(str, i) == REDIRECT_I)
+			tab.i_tab[++j] = REDIRECT_I;
+		if (is_redirect(str, i) == REDIRECT_O)
+			tab.i_tab[++j] = REDIRECT_O;*/
 	}
 	tab.i_tab[++j] = 0;
 	pipes_init(&tab);
