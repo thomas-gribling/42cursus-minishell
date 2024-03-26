@@ -6,7 +6,7 @@
 /*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 14:05:03 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/21 16:27:37 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/25 10:20:57 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,12 @@ void	call_builtin(t_instruct *ins)
 		dup_fds(ins, 0);
 }
 
-int	ft_pwd(char *arg)
+int	ft_pwd(char *arg, int *st)
 {
 	char	*path;
 	
 	if (arg)
-		return (ft_putferror(ERR_TMARGS, "pwd"), 1);
+		return (ft_putferror(ERR_TMARGS, "pwd", st, 1), 1);
 	else
 	{
 		path = getcwd(NULL, 0);
@@ -52,14 +52,14 @@ int	ft_pwd(char *arg)
 	return (0);
 }
 
-void	ft_pwd_env(char **cmd, t_instruct *ins)
+void	ft_pwd_env(char **cmd, t_instruct *ins, int *st)
 {
 	int		i;
 
 	ins->p = fork();
 	if (ins->p < 0)
 	{
-		ft_putferror(ERR_CREATE, "fork");
+		ft_putferror(ERR_CREATE, "fork", NULL, 0);
 		return ;
 	}
 	if (ins->p > 0)
@@ -67,10 +67,10 @@ void	ft_pwd_env(char **cmd, t_instruct *ins)
 	call_builtin(ins);
 	i = -1;
 	if (!ft_strcmp(cmd[0], "pwd"))
-		exit(ft_pwd(cmd[1]));
+		exit(ft_pwd(cmd[1], st));
 	else if (cmd[1])
 	{
-		ft_putferror(ERR_TMARGS, "env");
+		ft_putferror(ERR_TMARGS, "env", NULL, 0);
 		exit(1);
 	}
 	else
@@ -87,7 +87,7 @@ void	ft_echo(char **cmd, t_instruct *ins)
 	ins->p = fork();
 	if (ins->p < 0)
 	{
-		ft_putferror(ERR_CREATE, "fork");
+		ft_putferror(ERR_CREATE, "fork", NULL, 0);
 		return ;
 	}
 	if (ins->p > 0)
@@ -111,12 +111,12 @@ void	ft_echo(char **cmd, t_instruct *ins)
 	exit(0);
 }
 
-void	ft_cd(char **cmd)
+void	ft_cd(char **cmd, int *st)
 {
 	DIR	*dest_dir;
 
 	if (cmd[1] && cmd[2])
-		ft_putferror(ERR_TMARGS, "cd");
+		ft_putferror(ERR_TMARGS, "cd", st, 1);
 	else if (!cmd[1])
 		chdir(ft_getenv("HOME"));
 	else if (!ft_strcmp(cmd[1], ""))
@@ -125,9 +125,9 @@ void	ft_cd(char **cmd)
 	{
 		dest_dir = opendir(cmd[1]);
 		if (access(cmd[1], F_OK))
-			ft_putferror(ERR_NOFILE, cmd[1]);
+			ft_putferror(ERR_NOFILE, cmd[1], st, 1);
 		else if (!dest_dir)
-			ft_putferror(ERR_NODIRPERM, cmd[1]);
+			ft_putferror(ERR_NODIRPERM, cmd[1], st, 1);
 		else
 			chdir(cmd[1]);
 		if (dest_dir)
@@ -148,19 +148,19 @@ int	is_builtin(char *cmd)
 	return (1);
 }
 
-int	exe_builtin(t_instruct *ins, char **cmd)
+int	exe_builtin(t_instruct *ins, char **cmd, int *st)
 {
-	(void)ins;
 	if (!is_builtin(cmd[0]))
 		return (1);
+	*st = 0;
 	if (!ft_strcmp(cmd[0], "pwd") || !ft_strcmp(cmd[0], "env"))
-		ft_pwd_env(cmd, ins);
+		ft_pwd_env(cmd, ins, st);
 	if (!ft_strcmp(cmd[0], "echo"))
 		ft_echo(cmd, ins);
 	if (!ft_strcmp(cmd[0], "cd"))
-		ft_cd(cmd);
+		ft_cd(cmd, st);
 	if (!ft_strcmp(cmd[0], "unset") || !ft_strcmp(cmd[0], "export"))
-		ft_unset_export(cmd);
+		ft_unset_export(cmd, st, ins);
 	tab_free(cmd);
 	return (0);
 }

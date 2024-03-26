@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:33:34 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/15 15:39:20 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/03/25 09:10:08 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	ft_puterror(char *s)
 		write(2, &s[i], 1);
 }
 
-void	ft_putferror(char *s, char *arg)
+void	ft_putferror(char *s, char *arg, int *st, int new_st)
 {
 	int	i;
 
@@ -74,6 +74,8 @@ void	ft_putferror(char *s, char *arg)
 		else
 			write(2, &s[i], 1);
 	}
+	if (st)
+		*st = new_st;
 }
 
 void	tab_free(char **strs)

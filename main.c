@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 10:46:51 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/21 15:56:55 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/25 09:07:12 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static void	exe_command_quick(char *command)
 	{
 		p = fork();
 		if (p < 0)
-			ft_putferror(ERR_CREATE, "fork");
+			ft_putferror(ERR_CREATE, "fork", NULL, 0);
 		if (p == 0)
 			execve(command, &command, g_envp);
 		if (p > 0)
@@ -73,22 +73,24 @@ static void	signal_init(void)
 
 int	main(int ac, char **av, char **envp)
 {
-	char				*line;
-	t_instruct			instruct;
+	int			st;
+	char		*line;
+	t_instruct	instruct;
 
 	(void)ac;
 	(void)av;
 	signal_init();
 	g_envp = tab_dup(envp, 0);
+	st = 0;
 	exe_command_quick("clear");
 	print_header();
 	line = readline(PROMPT);
 	while (line && ft_strncmp(line, "exit", 4))
 	{
-		if (verif_instruct(line) && ft_strcmp(line, ""))
+		if (verif_instruct(line, &st) && ft_strcmp(line, ""))
 		{
 			instruct = init_tabinstruct(line);
-			start_parsing(line, &instruct);
+			start_parsing(line, &instruct, &st);
 			add_history(line);
 			if (!ft_strcmp(line, "clear"))
 				print_header();

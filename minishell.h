@@ -6,7 +6,7 @@
 /*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/21 16:27:05 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/25 10:21:19 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,10 @@
 # define SKY_BLUE "\033[0;96m"
 # define RESET "\033[0m"
 # define WHITE "\033[0;37m"
-# define PROMPT LIME "➜  " SKY_BLUE "minishell" RESET " "
+# define RED "\033[0;31m"
+# define YELLOW "\033[0;33m"
+# define PINK "\033[0;35m"
+# define PROMPT YELLOW "➜  " RED "minishell" RESET " "
 
 # define ERR_NOCMD "%s: command not found\n"
 # define ERR_NOFILE "%s: no such file or directory\n"
@@ -52,6 +55,8 @@
 # define ERR_TMARGS "%s: too many arguments\n"
 # define ERR_PARSE "minishell: parse error near `%s'\n"
 # define ERR_UNCLOSED "minishell: unclosed %s detected\n"
+# define ERR_VARNAME "%s: invalid variable name\n"
+# define ERR_VARMISS "%s: missing variable name\n"
 
 typedef struct s_instruct
 {
@@ -66,28 +71,29 @@ typedef struct s_instruct
 
 extern char	**g_envp;
 
-void		start_parsing(char *buffer, t_instruct *instruct);
+void		start_parsing(char *buffer, t_instruct *instruct, int *st);
 
-void		exe_command(char *command, t_instruct *ins);
-int			exe_builtin(t_instruct *ins, char **cmd);
+void		exe_command(char *command, t_instruct *ins, int *st);
+int			exe_builtin(t_instruct *ins, char **cmd, int *st);
 void		dup_fds(t_instruct *ins, int do_pipe);
 void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
 
 int			is_valid_char(char c);
 
+void		ft_pwd_env(char **cmd, t_instruct *ins, int *st);
 void		update_pwd(void);
 void		ft_export(char *new_var);
 int			find_var(char *var_name);
-void		ft_unset_export(char **cmd);
+void		ft_unset_export(char **cmd, int *st, t_instruct *ins);
 char		*ft_getenv(char *var);
-void		ft_unset(char *cmd);
+void		ft_unset(char *cmd, int *st);
 
 char		**get_paths(void);
 char		*try_path(char **strs, char *str);
 
 void		free_instruct(t_instruct *tab);
 t_instruct	init_tabinstruct(char *str);
-int			verif_instruct(char *str);
+int			verif_instruct(char *str, int *st);
 
 // Utils
 int			ft_strlen(char *s);
@@ -98,11 +104,12 @@ char		*ft_substr(char *s, int start, int len);
 char		*ft_strjoin(char *s1, char *s2, int do_free);
 void		ft_putstr_fd(char *str, int fd);
 void		ft_puterror(char *s);
-void		ft_putferror(char *s, char *arg);
+void		ft_putferror(char *s, char *arg, int *st, int new_st);
 void		tab_free(char **strs);
 char		*str_append(char *old, char c);
 char		**tab_dup(char **tab, int start);
 
 char		**ft_split(char *s, char c);
+char		*ft_itoa(int n);
 
 #endif

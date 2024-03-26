@@ -101,14 +101,14 @@ int	find_var(char *var_name)
 	return (free(path), -1);
 }
 
-void	ft_unset(char *cmd)
+void	ft_unset(char *cmd, int *st)
 {
 	int		indice;
 	int		i;
 	char	**tab;
 
 	if (!cmd)
-		ft_putferror(ERR_NEARGS, "unset");
+		ft_putferror(ERR_NEARGS, "unset", st, 1);
 	else if (ft_getenv(cmd) != NULL)
 	{
 		indice = find_var(cmd);

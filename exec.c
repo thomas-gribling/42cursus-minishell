@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:28:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/21 15:29:34 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/25 08:56:49 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int	ft_execve(char *path, char **argv, t_instruct *ins, int do_pipe)
 {
 	ins->p = fork();
 	if (ins->p < 0)
-		return (ft_putferror(ERR_CREATE, "fork"), 1);
+		return (ft_putferror(ERR_CREATE, "fork", NULL, 0), 1);
 	if (ins->p == 0)
 	{
 		dup_fds(ins, do_pipe);
@@ -96,23 +96,23 @@ void	call_ft_execve(char **cmd, t_instruct *ins)
 		ft_execve(cmd[0], cmd, ins, 0);
 }
 
-void	exe_command(char *command, t_instruct *ins)
+void	exe_command(char *command, t_instruct *ins, int *st)
 {
 	char	**paths;
 	char	**cmd;
 	char	*cmd_err;
 
 	cmd = ft_split(command, ' ');
-	if (!cmd || !exe_builtin(ins, cmd))
+	if (!cmd || !exe_builtin(ins, cmd, st))
 		return ;
 	cmd_err = ft_strdup(cmd[0]);
 	if (cmd[0][0] == '/' || (cmd[0][0] == '.' && cmd[0][1] == '/')
 		|| (cmd[0][0] == '~' && cmd[0][1] == '/'))
 	{
 		if (access(cmd[0], F_OK))
-			ft_putferror(ERR_NOFILE, cmd_err);
+			ft_putferror(ERR_NOFILE, cmd_err, st, 127);
 		else if ((access(cmd[0], X_OK)))
-			ft_putferror(ERR_NOPERM, cmd_err);
+			ft_putferror(ERR_NOPERM, cmd_err, st, 126);
 		else
 			call_ft_execve(cmd, ins);
 	}
@@ -122,7 +122,7 @@ void	exe_command(char *command, t_instruct *ins)
 		cmd[0] = try_path(paths, cmd[0]);
 		tab_free(paths);
 		if (!cmd[0])
-			ft_putferror(ERR_NOCMD, cmd_err);
+			ft_putferror(ERR_NOCMD, cmd_err, st, 127);
 		else
 			call_ft_execve(cmd, ins);
 	}

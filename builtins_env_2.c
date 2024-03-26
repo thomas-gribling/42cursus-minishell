@@ -49,20 +49,43 @@ int	find_var_pref(char *new_var)
 	return (indice);
 }
 
-void	ft_unset_export(char **cmd)
+int	is_valid_var(char *cmd, int *st)
+{
+	int	i;
+
+	i = -1;
+	if (cmd[0] <= '9' && cmd[0] >= '0')
+		return (ft_putferror(ERR_VARNAME, "export", st, 1), 0);
+	if (cmd[0] == '=')
+		return (ft_putferror(ERR_VARMISS, "export", st, 1), 0);
+	while (cmd[++i])
+		if (cmd[i] == '=')
+			return (1);
+	return (0);
+}
+
+void	ft_unset_export(char **cmd, int *st, t_instruct *ins)
 {
 	int	i;
 
 	i = 0;
 	if (cmd[0][0] == 'e')
 	{
+		if (!cmd[1])
+		{
+			ft_pwd_env(cmd, ins, st);
+			return ;
+		}
 		while (cmd[++i])
-			ft_export(cmd[i]);
+		{
+			if (is_valid_var(cmd[i], st))
+				ft_export(cmd[i]);
+		}
 	}
 	else
 	{
 		while (cmd[++i])
-			ft_unset(cmd[i]);
+			ft_unset(cmd[i], st);
 	}
 }
 

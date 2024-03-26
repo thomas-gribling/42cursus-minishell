@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 14:36:14 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/21 15:46:40 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/03/25 08:54:42 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	is_valid_char(char c)
 	return (1);
 }
 
-int	parse_buffer(char *buffer, t_instruct *instruct, int *i)
+int	parse_buffer(char *buffer, t_instruct *instruct, int *i, int *st)
 {
 	char	*tmp;
 	int		start;
@@ -41,37 +41,40 @@ int	parse_buffer(char *buffer, t_instruct *instruct, int *i)
 			start = *i + 1;
 			while (!is_valid_char(buffer[++(*i)]) || buffer[*i] == ' ')
 				start++;
-			exe_command(tmp, instruct);
+			exe_command(tmp, instruct, st);
 			free(tmp);
 		}
 	}
 	return (start);
 }
 
-void	replace_var(char *old, char **new, int *i)
+void	replace_var(char *old, char **new, int *i, int *st)
 {
 	int		start;
-	char	*temp1;
-	char	*temp2;
+	char	*var_name;
+	char	*var_value;
 
 	start = *i;
 	while (old[++(*i)] != '$' && old[*i] != '\''
 		&& old[*i] != '"' && old[*i] != ' ' && old[*i])
 		continue ;
-	temp1 = ft_substr(old, start + 1, *i - start - 1);
-	temp2 = ft_getenv(temp1);
-	free(temp1);
-	if (temp2)
+	var_name = ft_substr(old, start + 1, *i - start - 1);
+	if (!ft_strcmp(var_name, "?"))
+		var_value = ft_itoa(*st);
+	else
+		var_value = ft_getenv(var_name);
+	free(var_name);
+	if (var_value)
 	{
 		start = -1;
-		while (temp2[++start])
-			*new = str_append(*new, temp2[start]);
+		while (var_value[++start])
+			*new = str_append(*new, var_value[start]);
 	}
-	free(temp2);
+	free(var_value);
 	(*i)--;
 }
 
-char	*replace_vars(t_instruct *ins, char *old)
+char	*replace_vars(t_instruct *ins, char *old, int *st)
 {
 	int		i;
 	int		ind;
@@ -83,7 +86,7 @@ char	*replace_vars(t_instruct *ins, char *old)
 	while (old[++i])
 	{
 		if (old[i] == '$' && ins->var_tab[++ind])
-			replace_var(old, &new, &i);
+			replace_var(old, &new, &i, st);
 		else
 			new = str_append(new, old[i]);
 	}
@@ -128,7 +131,7 @@ char	*replace_roots(char *old)
 	return (new);
 }
 
-void	start_parsing(char *buffer, t_instruct *instruct)
+void	start_parsing(char *buffer, t_instruct *instruct, int *st)
 {
 	int		i;
 	int		start;
@@ -136,17 +139,17 @@ void	start_parsing(char *buffer, t_instruct *instruct)
 
 	i = -1;
 	instruct->ind = -1;
-	buffer = replace_vars(instruct, buffer);
+	buffer = replace_vars(instruct, buffer, st);
 	buffer = replace_roots(buffer);
-	start = parse_buffer(buffer, instruct, &i);
+	start = parse_buffer(buffer, instruct, &i, st);
 	if (start != i)
 	{
 		instruct->ind++;
 		tmp = ft_substr(buffer, start, i);
-		exe_command(tmp, instruct);
+		exe_command(tmp, instruct, st);
 		free(tmp);
 	}
 	close_all_pipes(instruct, 1, 0);
 	if (strncmp(buffer, "cd", 2) && strncmp(buffer, "unset", 5))
-		waitpid(instruct->p, NULL, 0);
+		waitpid(instruct->p, st, 0);
 }
