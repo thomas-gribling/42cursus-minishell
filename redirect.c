@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 14:31:23 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/04/02 10:53:49 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/02 16:29:53 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,7 @@ void	fill_redirect(t_instruct *ins, char **cmd, int *st, t_redirect *red)
 	int	j;
 	int	start;
 
+	red->cv = -1;
 	red->cmds = malloc((red->count + 2) * sizeof(char **));
 	red->redirs = malloc((red->count + 1) * sizeof(int));
 	i = -1;
@@ -126,7 +127,7 @@ void	fill_redirect(t_instruct *ins, char **cmd, int *st, t_redirect *red)
 	start = 0;
 	while (cmd[++i])
 	{
-		if (!cmd[i + 1] || typeof_redirect(cmd[i]))
+		if ((!cmd[i + 1] || typeof_redirect(cmd[i])) && red->validity[++red->cv])
 		{
 			red->redirs[++j] = typeof_redirect(cmd[i]);
 			if (i > 0)
@@ -146,6 +147,48 @@ void	fill_redirect(t_instruct *ins, char **cmd, int *st, t_redirect *red)
 	}
 	red->cmds[++j] = NULL;
 	do_redirects(ins, st, red);
+}
+
+int	is_it_redirect(char *s, int *i)
+{
+	if (s[*i] == '>' && s[*i + 1] == '>')
+		return ((*i)++, 1);
+	if (s[*i] == '<' && s[*i + 1] == '<')
+		return ((*i)++, 1);
+	if (s[*i] == '>' || s[*i] == '<')
+		return (1);
+	return (0);
+}
+
+int	*red_valid(char *s)
+{
+	int	*out;
+	int	i;
+	int	count;
+	int	opened;
+
+	out = NULL;
+	count = 0;
+	i = -1;
+	while (s[++i])
+		count += is_it_redirect(s, &i);
+	if (count)
+		out = malloc(count * sizeof(int));
+	opened = 0;
+	count = 0;
+	i = -1;
+	while (s[++i] && out)
+	{
+		if ((s[i] == '"' || s[i] == '\'') && !opened)
+			opened = s[i];
+		else if ((s[i] == '"' || s[i] == '\'') && opened == s[i])
+			opened = 0;
+		if (is_it_redirect(s, &i) && !opened)
+			out[++count] = 1;
+		if (is_it_redirect(s, &i) && opened)
+			out[++count] = 0;
+	}
+	return (out);
 }
 
 int	is_redirect(t_instruct *ins, char *command, int *st)
@@ -170,6 +213,9 @@ int	is_redirect(t_instruct *ins, char *command, int *st)
 			break ;
 	}
 	if (!command[i])
+		return (0);
+	red.validity = red_valid(command);
+	if (!red.validity)
 		return (0);
 	cmd = ft_split(command, ' ');
 	i = -1;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/02 13:59:20 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/04/02 17:11:34 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,8 @@ typedef struct s_redirect
 {
 	char	***cmds;
 	int		*redirs;
+	int		*validity;
+	int		cv;
 	int		count;
 }			t_redirect;
 
@@ -83,13 +85,16 @@ extern char	**g_envp;
 
 void		start_parsing(char *buffer, t_instruct *instruct, int *st);
 
+char		*replace_vars(t_instruct *ins, char *old, int *st);
+char		*replace_roots(char *old);
+
 void		exe_command(char **cmd, t_instruct *ins, int *st);
 int			is_redirect(t_instruct *ins, char *command, int *st);
 int			exe_builtin(t_instruct *ins, char **cmd, int *st);
 void		dup_fds(t_instruct *ins, int do_pipe);
 void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
 
-int			check_redirect(char *str);
+int			check_redirect(char *str, int *st);
 
 int			is_valid_char(char c);
 int			typeof_redirect(char *cmd);
@@ -111,6 +116,8 @@ char		*try_path(char **strs, char *str);
 void		free_instruct(t_instruct *tab);
 t_instruct	init_tabinstruct(char *str);
 int			verif_instruct(char *str, int *st);
+void		vars_init(t_instruct *instruct, char *str);
+void		pipes_init(t_instruct *instruct);
 
 // Utils
 int			ft_strlen(char *s);

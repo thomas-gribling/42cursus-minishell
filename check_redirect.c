@@ -3,38 +3,60 @@
 /*                                                        :::      ::::::::   */
 /*   check_redirect.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/02 13:20:43 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/04/02 13:20:43 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/04/02 17:06:17 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	check_redirect(char *str)
+int	valid_redirect(char *str)
+{
+	if (str[0] == '<' && str[1] == '<' && str[2] == ' ')
+		return (HEREDOC_I);
+	if (str[0] == '>' && str[1] == '>' && str[2] == ' ')
+		return (HEREDOC_O);
+	if (str[0] == '<' && str[1] == ' ')
+		return (REDIRECT_I);
+	if (str[0] == '>' && str[1] == ' ')
+		return (REDIRECT_O);
+	return (0);
+}
+
+static void	skip_quotes(char *str, int *i)
+{
+	if (str[*i] == '"')
+		while (str[++(*i)] != '"' && str[*i])
+			continue ;
+	if (str[*i] == '\'')
+		while (str[++(*i)] != '\'' && str[*i])
+			continue ;
+}
+
+int	check_redirect(char *str, int *st)
 {
 	int		i;
 	int		last;
-	char	**strs;
 
 	i = -1;
 	last = -1;
-	strs = ft_split(str, ' ');
-	while (strs[++i])
+	while (str[++i])
 	{
-		if (typeof_redirect(strs[i]))
+		skip_quotes(str, &i);
+		if (str[i] == '<' || str[i] == '>')
 		{
-			if (typeof_redirect(strs[i - 1]))
-				return (free(strs), 0);
-			if (typeof_redirect(strs[i + 1]))
-				return (free(strs), 0);
-			if (typeof_redirect(strs[i]) == last)
-				return (free(strs), 0);
-			last = typeof_redirect(strs[i]);
+			if (!valid_redirect(str + i) || valid_redirect(str + i) == last)
+				return (ft_putferror(ERR_PARSE, "redirection", st, 1), 0);
+			last = valid_redirect(str + i);
+			if (last == HEREDOC_I || last == HEREDOC_O)
+				i++;
+			while (str[++i] == ' ')
+				continue ;
+			if (str[i] == '<' || str[i] == '>')
+				return (ft_putferror(ERR_PARSE, "redirections", st, 1), 0);
 		}
-		if (ft_strcmp(strs[i], "|"))
-			last = 0;
 	}
-	return (free(strs), 1);
+	return (1);
 }

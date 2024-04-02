@@ -6,63 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:28:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/02 10:48:33 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/02 16:49:53 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	close_all_pipes(t_instruct *ins, int close_before, int close_curr)
-{
-	int	i;
-
-	i = -1;
-	while (++i < ins->size)
-	{
-		if (i == ins->ind && !close_curr)
-			continue ;
-		else if (i == ins->ind - 1 && !close_before)
-			continue ;
-		else
-		{
-			close(ins->pipes[i][0]);
-			close(ins->pipes[i][1]);
-		}
-	}
-}
-
-void	dup_fds(t_instruct *ins, int do_pipe)
-{
-	close(ins->pipe_heredoc[1]);
-	if (ins->dup_enter != ins->pipe_heredoc[0])
-		close(ins->pipe_heredoc[0]);
-	if (ins->dup_enter != -1)
-		dup2(ins->dup_enter, 0);
-	if (ins->dup_exit != -1)
-		dup2(ins->dup_exit, 1);
-	if (do_pipe == 0)
-		close_all_pipes(ins, 1, 0);
-	if (do_pipe == 1)
-	{
-		dup2(ins->pipes[ins->ind - 1][0], 0);
-		close(ins->pipes[ins->ind - 1][1]);
-		close_all_pipes(ins, 0, 1);
-	}
-	if (do_pipe == 2)
-	{
-		dup2(ins->pipes[ins->ind][1], 1);
-		close(ins->pipes[ins->ind][0]);
-		close_all_pipes(ins, 1, 0);
-	}
-	if (do_pipe == 3)
-	{
-		dup2(ins->pipes[ins->ind - 1][0], 0);
-		close(ins->pipes[ins->ind - 1][1]);
-		dup2(ins->pipes[ins->ind][1], 1);
-		close(ins->pipes[ins->ind][0]);
-		close_all_pipes(ins, 0, 0);
-	}
-}
 
 int	ft_execve(char *path, char **argv, t_instruct *ins, int do_pipe)
 {
@@ -103,9 +51,21 @@ void	call_ft_execve(char **cmd, t_instruct *ins)
 		ft_execve(cmd[0], cmd, ins, 0);
 }
 
-void	exe_command(char **cmd, t_instruct *ins, int *st)
+void	exe_command_path(char **cmd, t_instruct *ins, char *cmd_err, int *st)
 {
 	char	**paths;
+
+	paths = get_paths();
+	cmd[0] = try_path(paths, cmd[0]);
+	tab_free(paths);
+	if (!cmd[0])
+		ft_putferror(ERR_NOCMD, cmd_err, st, 127);
+	else
+		call_ft_execve(cmd, ins);
+}
+
+void	exe_command(char **cmd, t_instruct *ins, int *st)
+{
 	char	*cmd_err;
 
 	if (!cmd || !exe_builtin(ins, cmd, st))
@@ -122,15 +82,7 @@ void	exe_command(char **cmd, t_instruct *ins, int *st)
 			call_ft_execve(cmd, ins);
 	}
 	else
-	{
-		paths = get_paths();
-		cmd[0] = try_path(paths, cmd[0]);
-		tab_free(paths);
-		if (!cmd[0])
-			ft_putferror(ERR_NOCMD, cmd_err, st, 127);
-		else
-			call_ft_execve(cmd, ins);
-	}
+		exe_command_path(cmd, ins, cmd_err, st);
 	tab_free(cmd);
 	free(cmd_err);
 }
