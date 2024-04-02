@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 14:36:14 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/26 14:43:34 by ccadoret         ###   ########.fr       */
+/*   Updated: 2024/04/02 10:04:09 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ int	parse_buffer(char *buffer, t_instruct *instruct, int *i, int *st)
 			start = *i + 1;
 			while (!is_valid_char(buffer[++(*i)]) || buffer[*i] == ' ')
 				start++;
-			exe_command(tmp, instruct, st);
+			if (!is_redirect(instruct, tmp, st))
+				exe_command(ft_split(tmp, ' '), instruct, st);
 			free(tmp);
 		}
 	}
@@ -146,7 +147,8 @@ void	start_parsing(char *buffer, t_instruct *instruct, int *st)
 	{
 		instruct->ind++;
 		tmp = ft_substr(buffer, start, i);
-		exe_command(tmp, instruct, st);
+		if (!is_redirect(instruct, tmp, st))
+			exe_command(ft_split(tmp, ' '), instruct, st);
 		free(tmp);
 	}
 	close_all_pipes(instruct, 1, 0);

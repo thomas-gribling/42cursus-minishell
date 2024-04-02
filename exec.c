@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:28:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/26 16:53:39 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/02 10:48:33 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,13 @@ void	close_all_pipes(t_instruct *ins, int close_before, int close_curr)
 
 void	dup_fds(t_instruct *ins, int do_pipe)
 {
+	close(ins->pipe_heredoc[1]);
+	if (ins->dup_enter != ins->pipe_heredoc[0])
+		close(ins->pipe_heredoc[0]);
+	if (ins->dup_enter != -1)
+		dup2(ins->dup_enter, 0);
+	if (ins->dup_exit != -1)
+		dup2(ins->dup_exit, 1);
 	if (do_pipe == 0)
 		close_all_pipes(ins, 1, 0);
 	if (do_pipe == 1)
@@ -96,15 +103,11 @@ void	call_ft_execve(char **cmd, t_instruct *ins)
 		ft_execve(cmd[0], cmd, ins, 0);
 }
 
-void	exe_command(char *command, t_instruct *ins, int *st)
+void	exe_command(char **cmd, t_instruct *ins, int *st)
 {
 	char	**paths;
-	char	**cmd;
 	char	*cmd_err;
 
-	if (!command || is_redirect(ins, command, st))
-		return ;
-	cmd = ft_split(command, ' ');
 	if (!cmd || !exe_builtin(ins, cmd, st))
 		return ;
 	cmd_err = ft_strdup(cmd[0]);

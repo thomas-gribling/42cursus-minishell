@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/26 16:53:50 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/02 13:59:20 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@
 # define RED "\033[0;31m"
 # define YELLOW "\033[0;33m"
 # define PINK "\033[0;35m"
-# define PROMPT YELLOW "➜  " RED "minishell" RESET " "
+# define PROMPT LIME "➜  " SKY_BLUE "minishell" RESET " "
 
 # define ERR_NOCMD "%s: command not found\n"
 # define ERR_NOFILE "%s: no such file or directory\n"
@@ -63,7 +63,10 @@ typedef struct s_instruct
 	pid_t	p;
 	int		size;
 	int		ind;
+	int		dup_enter;
+	int		dup_exit;
 	int		*i_tab;
+	int		pipe_heredoc[2];
 	int		*var_tab;
 	int		**pipes;
 	char	**envp;
@@ -80,13 +83,16 @@ extern char	**g_envp;
 
 void		start_parsing(char *buffer, t_instruct *instruct, int *st);
 
-void		exe_command(char *command, t_instruct *ins, int *st);
+void		exe_command(char **cmd, t_instruct *ins, int *st);
 int			is_redirect(t_instruct *ins, char *command, int *st);
 int			exe_builtin(t_instruct *ins, char **cmd, int *st);
 void		dup_fds(t_instruct *ins, int do_pipe);
 void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
 
+int			check_redirect(char *str);
+
 int			is_valid_char(char c);
+int			typeof_redirect(char *cmd);
 
 void		call_builtin(t_instruct *ins);
 void		ft_pwd_env(char **cmd, t_instruct *ins, int *st);
