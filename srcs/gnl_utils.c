@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/20 09:44:01 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:57:17 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 16:25:36 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/gnl.h"
+#include "../include/gnl.h"
 
 char	*ft_strjoin_bis(char *s1, char *s2)
 {

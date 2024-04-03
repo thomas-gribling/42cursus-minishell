@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 10:26:57 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/04/03 15:55:08 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 16:18:49 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,19 @@
 
 void	update_pwd(void)
 {
-	int		indice;
+	int		indice[2];
 
-	indice = find_var("OLDPWD");
-	if (indice >= 0)
+	indice[0] = find_var("PWD");
+	indice[1] = find_var("OLDPWD");
+	if (indice[0] >= 0)
 	{
-		free(g_envp[indice]);
-		g_envp[indice] = ft_strjoin("OLDPWD=", ft_getenv("PWD"), 2);
+		free(g_envp[indice[0]]);
+		g_envp[indice[0]] = ft_strjoin("PWD=", getcwd(NULL, 0), 2);
 	}
-	indice = find_var("PWD");
-	if (indice >= 0)
+	if (indice[0] >= 0 && indice[1] >= 0)
 	{
-		free(g_envp[indice]);
-		g_envp[indice] = ft_strjoin("PWD=", getcwd(NULL, 0), 2);
+		free(g_envp[indice[1]]);
+		g_envp[indice[1]] = ft_strjoin("OLDPWD=", ft_getenv("PWD"), 2);
 	}
 }
 
