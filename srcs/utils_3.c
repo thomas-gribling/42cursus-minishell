@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 11:06:39 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/26 16:47:29 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:56:43 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 char	*str_append(char *old, char c)
 {
@@ -58,5 +58,18 @@ char	**tab_dup_n(char **tab, int start, int n)
 	while (tab[++i] && i - start < n)
 		out[i - start] = ft_strdup(tab[i]);
 	out[i - start] = NULL;
+	return (out);
+}
+
+char	*get_pipes_heredoc(int pipes_amt)
+{
+	int		i;
+	char	*out;
+
+	out = ft_strdup("");
+	i = -1;
+	while (++i < pipes_amt)
+		out = ft_strjoin(out, "pipe ", 1);
+	out = ft_strjoin(out, "heredoc> ", 1);
 	return (out);
 }

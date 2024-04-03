@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/02 17:11:34 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:28:06 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@
 # define RED "\033[0;31m"
 # define YELLOW "\033[0;33m"
 # define PINK "\033[0;35m"
-# define PROMPT LIME "➜  " SKY_BLUE "minishell" RESET " "
+# define PROMPT "\033[0;92m➜  \033[0;96mminishell \033[0m"
 
 # define ERR_NOCMD "%s: command not found\n"
 # define ERR_NOFILE "%s: no such file or directory\n"
@@ -79,6 +79,10 @@ typedef struct s_redirect
 	int		*validity;
 	int		cv;
 	int		count;
+	int		i;
+	int		j;
+	int		k;
+	int		tmp;
 }			t_redirect;
 
 extern char	**g_envp;
@@ -95,9 +99,9 @@ void		dup_fds(t_instruct *ins, int do_pipe);
 void		close_all_pipes(t_instruct *ins, int close_before, int close_curr);
 
 int			check_redirect(char *str, int *st);
+void		fill_redir(t_instruct *ins, char *buff, int *st, t_redirect *red);
 
 int			is_valid_char(char c);
-int			typeof_redirect(char *cmd);
 
 void		call_builtin(t_instruct *ins);
 void		ft_pwd_env(char **cmd, t_instruct *ins, int *st);
@@ -108,6 +112,7 @@ void		ft_export(char *new_var);
 int			find_var(char *var_name);
 void		ft_unset_export(char **cmd, int *st, t_instruct *ins);
 char		*ft_getenv(char *var);
+void		ft_varcpy(int size_path, int ind, char *var);
 void		ft_unset(char *cmd, int *st);
 
 char		**get_paths(void);
@@ -118,6 +123,11 @@ t_instruct	init_tabinstruct(char *str);
 int			verif_instruct(char *str, int *st);
 void		vars_init(t_instruct *instruct, char *str);
 void		pipes_init(t_instruct *instruct);
+
+int			try_open(char *path, int *st, int input, int append);
+void		read_stdin(int *stdin_pipe, char *keyword, int pipes_amt);
+int			is_it_redirect(char *s, int *i);
+int			typeof_redirect(char *cmd, int i);
 
 // Utils
 int			ft_strlen(char *s);
@@ -133,6 +143,7 @@ void		tab_free(char **strs);
 char		*str_append(char *old, char c);
 char		**tab_dup(char **tab, int start);
 char		**tab_dup_n(char **tab, int start, int n);
+char		*get_pipes_heredoc(int pipes_amt);
 
 char		**ft_split(char *s, char c);
 char		*ft_itoa(int n);

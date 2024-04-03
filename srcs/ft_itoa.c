@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/03 14:57:34 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/25 08:50:13 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:55:22 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 static int	ft_pow(int n, int pow)
 {

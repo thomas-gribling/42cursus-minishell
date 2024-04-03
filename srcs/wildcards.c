@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/02 16:56:18 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/02 16:57:10 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:57:01 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 static void	replace_var(char *old, char **new, int *i, int *st)
 {

@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/02 16:41:56 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/02 16:42:08 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:56:03 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 void	close_all_pipes(t_instruct *ins, int close_before, int close_curr)
 {
@@ -44,7 +44,8 @@ static void	dup_redirects(t_instruct *ins)
 
 void	dup_fds(t_instruct *ins, int do_pipe)
 {
-	dup_redirects(ins);
+	if (ins->dup_enter != -1 || ins->dup_exit != -1)
+		dup_redirects(ins);
 	if (do_pipe == 0)
 		close_all_pipes(ins, 1, 0);
 	if (do_pipe == 1)

@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   gnl_utils.c                                        :+:      :+:    :+:   */
+/*   utils_2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/20 09:44:01 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/27 14:43:34 by tgriblin         ###   ########.fr       */
+/*   Created: 2024/03/15 15:33:34 by tgriblin          #+#    #+#             */
+/*   Updated: 2024/04/03 15:56:33 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "gnl.h"
+#include "../include/minishell.h"
 
-char	*ft_strjoin_bis(char *s1, char *s2)
+char	*ft_strjoin(char *s1, char *s2, int do_free)
 {
 	char	*s3;
 	int		i;
@@ -34,32 +34,56 @@ char	*ft_strjoin_bis(char *s1, char *s2)
 		j++;
 	}
 	s3[i + j] = '\0';
-	if (s1)
+	if (do_free == 1 || do_free == 3)
 		free(s1);
+	if (do_free == 2 || do_free == 3)
+		free(s2);
 	return (s3);
 }
 
-void	*free_null(void *ptr1, void *ptr2)
+void	ft_putstr_fd(char *str, int fd)
 {
-	if (ptr1)
-		free(ptr1);
-	if (ptr2)
-		free(ptr2);
-	return (NULL);
+	int	i;
+
+	i = -1;
+	while (str[++i])
+		write(fd, &str[i], 1);
 }
 
-char	*ft_strchr(const char *s, int c)
+void	ft_puterror(char *s)
 {
-	int		i;
-	char	ch;
-	char	*str;
+	int	i;
 
-	i = 0;
-	str = (char *)s;
-	ch = (char)c;
-	while (str[i] != ch && str[i])
-		i++;
-	if (str[i] == '\0' && ch != '\0')
-		return (NULL);
-	return (str + i);
+	i = -1;
+	while (s[++i])
+		write(2, &s[i], 1);
+}
+
+void	ft_putferror(char *s, char *arg, int *st, int new_st)
+{
+	int	i;
+
+	i = -1;
+	while (s[++i])
+	{
+		if (s[i] == '%' && s[i + 1] == 's')
+		{
+			ft_puterror(arg);
+			i++;
+		}
+		else
+			write(2, &s[i], 1);
+	}
+	if (st)
+		*st = new_st;
+}
+
+void	tab_free(char **strs)
+{
+	int	i;
+
+	i = -1;
+	while (strs[++i])
+		free(strs[i]);
+	free(strs);
 }

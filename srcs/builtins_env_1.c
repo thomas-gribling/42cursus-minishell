@@ -6,36 +6,36 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/19 12:59:57 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/03/26 09:00:44 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:55:04 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
-void	ft_varcpy(int size_path, int ind, char *var)
+int	read_varenv(char *path, int i)
 {
-	int	i;
-	int	j;
+	int		j;
+	int		size;
+	char	c;
 
-	i = size_path - 1;
-	j = -1;
-	while (g_envp[ind][++i])
+	j = ft_strlen(path) - 1;
+	while (g_envp[i][++j])
 	{
-		if (g_envp[ind][i] == '"')
+		if (g_envp[i][j] == '"' || g_envp[i][j] == '\'')
 		{
-			while (g_envp[ind][++i] != '"')
-				var[++j] = g_envp[ind][i];
-			i++;
+			c = g_envp[i][j];
+			while (g_envp[i][++j] != c)
+				size++;
+			j++;
 		}
-		var[++j] = g_envp[ind][i];
+		size++;
 	}
-	var[++j] = '\0';
+	return (size);
 }
 
 char	*alloc_varenv(char *path)
 {
 	int		i;
-	int		j;
 	int		size;
 	char	*str;
 
@@ -45,17 +45,7 @@ char	*alloc_varenv(char *path)
 	{
 		if (!ft_strncmp(path, g_envp[i], ft_strlen(path)))
 		{
-			j = ft_strlen(path) - 1;
-			while (g_envp[i][++j])
-			{
-				if (g_envp[i][j] == '"')
-				{
-					while (g_envp[i][++j] != '"')
-						size++;
-					j++;
-				}
-				size++;
-			}
+			size += read_varenv(path, i);
 		}
 	}
 	str = malloc((size + 1) * sizeof(char));

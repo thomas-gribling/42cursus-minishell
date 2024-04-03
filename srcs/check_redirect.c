@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/02 13:20:43 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/04/02 17:06:17 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:55:13 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 int	valid_redirect(char *str)
 {

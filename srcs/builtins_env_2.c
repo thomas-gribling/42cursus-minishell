@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 10:26:57 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/03/26 08:53:25 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:55:08 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 void	update_pwd(void)
 {

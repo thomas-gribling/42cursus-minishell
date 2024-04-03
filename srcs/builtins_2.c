@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 08:48:08 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/26 08:58:45 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:54:53 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 void	ft_echo_fork(char **cmd)
 {
@@ -72,4 +72,24 @@ void	ft_cd(char **cmd, int *st)
 			closedir(dest_dir);
 		update_pwd();
 	}
+}
+
+void	ft_varcpy(int size_path, int ind, char *var)
+{
+	int	i;
+	int	j;
+
+	i = size_path - 1;
+	j = -1;
+	while (g_envp[ind][++i])
+	{
+		if (g_envp[ind][i] == '"')
+		{
+			while (g_envp[ind][++i] != '"')
+				var[++j] = g_envp[ind][i];
+			i++;
+		}
+		var[++j] = g_envp[ind][i];
+	}
+	var[++j] = '\0';
 }

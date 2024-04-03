@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:14:24 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/18 11:09:50 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:56:28 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 int	ft_strlen(char *s)
 {

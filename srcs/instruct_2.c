@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/02 17:09:43 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/02 17:16:02 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:55:38 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 void	pipes_init(t_instruct *instruct)
 {

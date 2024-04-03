@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 14:50:29 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/04/02 17:10:52 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:55:32 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 t_instruct	init_tabinstruct(char *str)
 {

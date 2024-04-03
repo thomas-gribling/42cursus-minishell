@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 14:36:14 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/02 17:04:38 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:55:48 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 int	is_valid_char(char c)
 {
@@ -24,6 +24,23 @@ static void	skip_quotes(char *buffer, int *opened, int *i)
 	*opened = buffer[(*i)];
 	while (buffer[++(*i)] && buffer[*i] != *opened)
 		continue ;
+}
+
+static int	do_waitpid(char *buffer)
+{
+	int	i;
+	int	len;
+
+	if (!ft_strncmp(buffer, "cd", 2) || !ft_strncmp(buffer, "unset", 5))
+		return (0);
+	i = -1;
+	len = 0;
+	while (buffer[++i])
+		if (buffer[i] != ' ')
+			len++;
+	if (!ft_strncmp(buffer, "export", 6) && len > 6)
+		return (0);
+	return (1);
 }
 
 int	parse_buffer(char *buffer, t_instruct *instruct, int *i, int *st)
@@ -72,6 +89,6 @@ void	start_parsing(char *buffer, t_instruct *instruct, int *st)
 		free(tmp);
 	}
 	close_all_pipes(instruct, 1, 0);
-	if (strncmp(buffer, "cd", 2) && strncmp(buffer, "unset", 5))
+	if (do_waitpid(buffer))
 		waitpid(instruct->p, st, 0);
 }

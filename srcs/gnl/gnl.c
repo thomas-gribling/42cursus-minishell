@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/19 08:56:36 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/03/27 14:45:16 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:57:33 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "gnl.h"
+#include "../../include/gnl.h"
 
 char	*ft_fill_stash(int fd, char *stash)
 {

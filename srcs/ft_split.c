@@ -6,11 +6,11 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/13 12:19:28 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/03/15 17:14:30 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/03 15:55:26 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../include/minishell.h"
 
 int	size_tab(char *s, int c, char t)
 {
@@ -63,13 +63,31 @@ int	strstrlen(char *s, char c)
 	return (i - (nb * 2));
 }
 
+char	*in_cotes(char *s, char **tab, int i, int *j)
+{
+	char	t;
+
+	t = '"';
+	if (*s == '\'' || *s == '"')
+	{
+		t = *s;
+		s++;
+		while (*s != t && *s != '\0')
+		{
+			tab[i][*j] = *s;
+			*j += 1;
+			s++;
+		}
+		s++;
+	}
+	return (s);
+}
+
 char	*fill_tab(char *s, char c, char **tab, int i)
 {
 	int		size_low;	
 	int		j;
-	char	t;
 
-	t = '"';
 	while (*s == c)
 		s++;
 	size_low = strstrlen(s, c);
@@ -77,17 +95,7 @@ char	*fill_tab(char *s, char c, char **tab, int i)
 	j = -1;
 	while (++j < size_low)
 	{
-		if (*s == '\'' || *s == '"')
-		{
-			t = *s;
-			s++;
-			while (*s != t && *s != '\0')
-			{
-				tab[i][j++] = *s;
-				s++;
-			}
-			s++;
-		}
+		s = in_cotes(s, tab, i, &j);
 		if (*s == c)
 		{
 			tab[i][j] = '\0';
