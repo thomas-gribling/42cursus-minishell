@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:28:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:55:17 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/04 15:22:02 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void	call_ft_execve(char **cmd, t_instruct *ins)
 		ft_execve(cmd[0], cmd, ins, 0);
 }
 
-void	exe_command_path(char **cmd, t_instruct *ins, char *cmd_err, int *st)
+int	exe_command_path(char **cmd, t_instruct *ins, char *cmd_err, int *st)
 {
 	char	**paths;
 
@@ -59,21 +59,26 @@ void	exe_command_path(char **cmd, t_instruct *ins, char *cmd_err, int *st)
 	cmd[0] = try_path(paths, cmd[0]);
 	tab_free(paths);
 	if (!cmd[0])
-		ft_putferror(ERR_NOCMD, cmd_err, st, 127);
+		return (ft_putferror(ERR_NOCMD, cmd_err, st, 127), 0);
 	else
 		call_ft_execve(cmd, ins);
+	return (1);
 }
 
-void	exe_command(char **cmd, t_instruct *ins, int *st)
+int	exe_command(char **cmd, t_instruct *ins, int *st)
 {
 	char	*cmd_err;
+	int		out;
 
-	if (!cmd || !exe_builtin(ins, cmd, st))
-		return ;
+	out = exe_builtin(ins, cmd, st);
+	if (!cmd || out != -1)
+		return (out);
+	out = 0;
 	cmd_err = ft_strdup(cmd[0]);
 	if (cmd[0][0] == '/' || (cmd[0][0] == '.' && cmd[0][1] == '/')
 		|| (cmd[0][0] == '~' && cmd[0][1] == '/'))
 	{
+		out = 0;
 		if (access(cmd[0], F_OK))
 			ft_putferror(ERR_NOFILE, cmd_err, st, 127);
 		else if ((access(cmd[0], X_OK)))
@@ -82,7 +87,37 @@ void	exe_command(char **cmd, t_instruct *ins, int *st)
 			call_ft_execve(cmd, ins);
 	}
 	else
-		exe_command_path(cmd, ins, cmd_err, st);
+		out = exe_command_path(cmd, ins, cmd_err, st);
 	tab_free(cmd);
 	free(cmd_err);
+	return (out);
+}
+
+void	exe_command_quick(char *command)
+{
+	char	**paths;
+	char	*cmd;
+	pid_t	p;
+
+	paths = get_paths();
+	cmd = ft_strdup(command);
+	cmd = try_path(paths, cmd);
+	tab_free(paths);
+	paths = malloc(2 * sizeof(char *));
+	paths[0] = ft_strdup(cmd);
+	paths[1] = NULL;
+	if (!cmd)
+		return ;
+	else
+	{
+		p = fork();
+		if (p < 0)
+			ft_putferror(ERR_CREATE, "fork", NULL, 0);
+		if (p == 0)
+			execve(cmd, paths, g_envp);
+		if (p > 0)
+			waitpid(p, NULL, 0);
+	}
+	tab_free(paths);
+	free(cmd);
 }

@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 14:40:37 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:56:15 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/04 15:09:51 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,24 +56,22 @@ void	do_redirects(t_instruct *ins, int *st, t_redirect *red)
 	close(ins->pipe_heredoc[1]);
 }
 
-void	parse_loop(t_redirect *red, char *buff, char *temp, int start)
+void	parse_loop(t_redirect *red, char *s, char *temp, int start)
 {
 	red->i = -1;
 	red->j = -1;
 	red->k = -1;
-	while (buff[++red->i])
+	while (s[++red->i])
 	{
-		red->tmp = typeof_redirect(buff, red->i);
-		if (!buff[red->i + 1] || is_it_redirect(buff, &red->i))
+		red->tmp = typeof_redirect(s, red->i);
+		if (!s[red->i + 1] || is_it_redirect(s, &red->i))
 		{
 			if (red->validity[++red->k])
 			{
 				red->redirs[++red->j] = red->tmp;
 				if (red->tmp == HEREDOC_I || red->tmp == HEREDOC_O)
 					red->i--;
-				if (!buff[red->i + 1])
-					red->i++;
-				temp = ft_substr(buff, start, red->i - start);
+				temp = ft_substr(s, start, red->i - start + !s[red->i + 1]);
 				red->cmds[red->j] = ft_split(temp, ' ');
 				free(temp);
 				start = red->i + 1;

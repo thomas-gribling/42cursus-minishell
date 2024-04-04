@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 08:48:08 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:54:53 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/04 10:21:56 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,14 @@ void	ft_echo(char **cmd, t_instruct *ins)
 
 void	ft_cd(char **cmd, int *st)
 {
-	DIR	*dest_dir;
+	DIR		*dest_dir;
+	char	*home;
 
+	home = ft_getenv("HOME");
 	if (cmd[1] && cmd[2])
 		ft_putferror(ERR_TMARGS, "cd", st, 1);
 	else if (!cmd[1])
-		chdir(ft_getenv("HOME"));
+		chdir(home);
 	else if (!ft_strcmp(cmd[1], ""))
 		return ;
 	else if (cmd[1])
@@ -72,6 +74,7 @@ void	ft_cd(char **cmd, int *st)
 			closedir(dest_dir);
 		update_pwd();
 	}
+	free(home);
 }
 
 void	ft_varcpy(int size_path, int ind, char *var)

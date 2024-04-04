@@ -6,36 +6,13 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 10:46:51 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:55:43 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/04 15:21:54 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
 char	**g_envp;
-
-static void	exe_command_quick(char *command)
-{
-	char	**paths;
-	pid_t	p;
-
-	paths = get_paths();
-	command = try_path(paths, command);
-	tab_free(paths);
-	if (!command)
-		return ;
-	else
-	{
-		p = fork();
-		if (p < 0)
-			ft_putferror(ERR_CREATE, "fork", NULL, 0);
-		if (p == 0)
-			execve(command, &command, g_envp);
-		if (p > 0)
-			waitpid(p, NULL, 0);
-	}
-	free(command);
-}
 
 static void	print_header(void)
 {
@@ -71,27 +48,32 @@ static void	signal_init(void)
 	signal(SIGQUIT, SIG_IGN);
 }
 
+static void	init_all(int ac, char **av, char **envp, int *st)
+{
+	(void)ac;
+	(void)av;
+	signal_init();
+	g_envp = tab_dup(envp, 0);
+	*st = 0;
+	exe_command_quick("clear");
+	print_header();
+}
+
 int	main(int ac, char **av, char **envp)
 {
 	int			st;
 	char		*line;
 	t_instruct	instruct;
 
-	(void)ac;
-	(void)av;
-	signal_init();
-	g_envp = tab_dup(envp, 0);
-	st = 0;
-	exe_command_quick("clear");
-	print_header();
+	init_all(ac, av, envp, &st);
 	line = readline(PROMPT);
 	while (line && ft_strncmp(line, "exit", 4))
 	{
-		if (verif_instruct(line, &st) && ft_strcmp(line, ""))
+		if (ft_strcmp(line, "") && verif_instruct(line, &st))
 		{
-			instruct = init_tabinstruct(line);
-			start_parsing(line, &instruct, &st);
 			add_history(line);
+			instruct = init_tabinstruct(line);
+			start_parsing(ft_strdup(line), &instruct, &st);
 			if (!ft_strcmp(line, "clear"))
 				print_header();
 			free_instruct(&instruct);

@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/02 16:56:18 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:57:01 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/04 08:56:56 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ char	*replace_vars(t_instruct *ins, char *old, int *st)
 		else
 			new = str_append(new, old[i]);
 	}
+	free(old);
 	return (new);
 }
 
@@ -92,5 +93,6 @@ char	*replace_roots(char *old)
 		else
 			new = str_append(new, old[i]);
 	}
+	free(old);
 	return (new);
 }

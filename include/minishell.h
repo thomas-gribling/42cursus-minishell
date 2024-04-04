@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:28:06 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/04 15:22:25 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ typedef struct s_instruct
 	int		ind;
 	int		dup_enter;
 	int		dup_exit;
+	int		do_wait;
 	int		*i_tab;
 	int		pipe_heredoc[2];
 	int		*var_tab;
@@ -92,7 +93,8 @@ void		start_parsing(char *buffer, t_instruct *instruct, int *st);
 char		*replace_vars(t_instruct *ins, char *old, int *st);
 char		*replace_roots(char *old);
 
-void		exe_command(char **cmd, t_instruct *ins, int *st);
+int			exe_command(char **cmd, t_instruct *ins, int *st);
+void		exe_command_quick(char *command);
 int			is_redirect(t_instruct *ins, char *command, int *st);
 int			exe_builtin(t_instruct *ins, char **cmd, int *st);
 void		dup_fds(t_instruct *ins, int do_pipe);

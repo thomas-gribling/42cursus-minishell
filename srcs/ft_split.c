@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/13 12:19:28 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/04/03 15:55:26 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/04 15:12:26 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ char	*fill_tab(char *s, char c, char **tab, int i)
 	while (*s == c)
 		s++;
 	size_low = strstrlen(s, c);
-	tab[i] = (char *)malloc(sizeof(char) * (size_low + 1));
+	tab[i] = (char *)malloc(sizeof(char) * (size_low + 2));
 	j = -1;
 	while (++j < size_low)
 	{

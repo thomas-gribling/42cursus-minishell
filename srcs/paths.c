@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:29:15 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:55:57 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/04 14:15:50 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,9 @@ char	**get_paths(void)
 {
 	char	**strs;
 	char	*tmp;
-	int		i;
 
-	strs = NULL;
-	i = -1;
-	while (g_envp[++i])
-		if (!ft_strncmp(g_envp[i], "PATH=", 5))
-			strs = ft_split(g_envp[i], ':');
-	tmp = malloc(ft_strlen(strs[0]) - 4);
-	i = 4;
-	while (strs[0][++i])
-		tmp[i - 5] = strs[0][i];
-	tmp[i - 5] = '\0';
-	free(strs[0]);
-	strs[0] = malloc(ft_strlen(tmp) + 1);
-	i = -1;
-	while (tmp[++i])
-		strs[0][i] = tmp[i];
-	strs[0][i] = '\0';
+	tmp = ft_getenv("PATH");
+	strs = ft_split(tmp, ':');
 	free(tmp);
 	return (strs);
 }
@@ -58,7 +43,7 @@ char	*try_path(char **strs, char *str)
 	{
 		path = join_path(strs[i], str);
 		if (access(path, X_OK) == 0)
-			return (path);
+			return (free(str), path);
 		free(path);
 		i++;
 	}

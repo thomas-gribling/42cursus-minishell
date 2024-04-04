@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 14:05:03 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:54:55 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/04 09:35:07 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,17 +93,29 @@ int	is_builtin(char *cmd)
 
 int	exe_builtin(t_instruct *ins, char **cmd, int *st)
 {
+	int	out;
+
+	out = 1;
 	if (!is_builtin(cmd[0]))
-		return (1);
+		return (-1);
 	*st = 0;
 	if (!ft_strcmp(cmd[0], "pwd") || !ft_strcmp(cmd[0], "env"))
 		ft_pwd_env(cmd, ins, st);
 	if (!ft_strcmp(cmd[0], "echo"))
 		ft_echo(cmd, ins);
 	if (!ft_strcmp(cmd[0], "cd"))
+	{
+		out = 0;
 		ft_cd(cmd, st);
+	}
 	if (!ft_strcmp(cmd[0], "unset") || !ft_strcmp(cmd[0], "export"))
+	{
+		out = 0;
+		if (!ft_strcmp(cmd[0], "export"))
+			if (!cmd[1])
+				out = 1;
 		ft_unset_export(cmd, st, ins);
+	}
 	tab_free(cmd);
-	return (0);
+	return (out);
 }

@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 14:31:23 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/04/03 15:56:09 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/04 14:08:07 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,21 @@ static int	count_valid_redirects(char *buffer)
 	return (count);
 }
 
+static void	free_redirs(t_redirect *red)
+{
+	int	i;
+
+	i = 0;
+	free(red->validity);
+	if (red->redirs)
+		free(red->redirs);
+	if (red->cmds)
+		while (red->cmds[++i])
+			tab_free(red->cmds[i]);
+	if (red->cmds)
+		free(red->cmds);
+}
+
 int	is_redirect(t_instruct *ins, char *command, int *st)
 {
 	t_redirect	red;
@@ -78,6 +93,8 @@ int	is_redirect(t_instruct *ins, char *command, int *st)
 	red.validity = red_valid(command, red.count);
 	if (!red.validity)
 		return (0);
+	red.redirs = NULL;
+	red.cmds = NULL;
 	fill_redir(ins, command, st, &red);
-	return (free(red.validity), 1);
+	return (free_redirs(&red), 1);
 }
