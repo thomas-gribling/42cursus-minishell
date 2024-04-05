@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 14:50:29 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/04/05 11:41:36 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/05 11:49:14 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,12 @@ int	get_pipes_amt(char *str)
 {
 	int	i;
 	int	count;
-	
+
 	i = -1;
 	count = 0;
 	while (str[++i])
 	{
-		i = skip_quotes(str, i);
+		i = skip_all_quotes(str, i);
 		if (str[i] == '|')
 			count++;
 	}
@@ -43,7 +43,7 @@ t_instruct	init_tabinstruct(char *str)
 	i = -1;
 	while (str[++i])
 	{
-		i = skip_quotes(str, i);
+		i = skip_all_quotes(str, i);
 		if (str[i] == '|')
 			tab.i_tab[++j] = PIPE;
 	}

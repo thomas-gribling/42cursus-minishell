@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 14:36:14 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/05 11:40:03 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/05 11:49:56 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	is_valid_char(char c)
 	return (1);
 }
 
-int	skip_quotes(char *str, int i)
+int	skip_all_quotes(char *str, int i)
 {
 	int	opened;
 
@@ -28,34 +28,21 @@ int	skip_quotes(char *str, int i)
 	{
 		opened = str[i];
 		while (str[++i] != opened)
-			continue;
+			continue ;
 	}
 	return (i);
-}
-
-void	switch_quotes(char c, int *opened)
-{
-	if (c == '\'' || c == '"')
-	{
-		if (!(*opened))
-			*opened = c;
-		else if (*opened == c)
-			*opened = 0;
-	}
 }
 
 int	parse_buffer(char *buffer, t_instruct *ins, int *i, int *st)
 {
 	char	*tmp;
 	int		start;
-	int		opened;
 
 	start = 0;
-	opened = 0;
 	while (buffer[++(*i)])
 	{
-		switch_quotes(buffer[*i], &opened);
-		if (!is_valid_char(buffer[*i]) && !opened)
+		*i = skip_all_quotes(buffer, *i);
+		if (!is_valid_char(buffer[*i]))
 		{
 			ins->ind++;
 			tmp = ft_substr(buffer, start, *i - start);
@@ -84,6 +71,7 @@ void	start_parsing(char *buffer, t_instruct *instruct, int *st)
 	start = parse_buffer(buffer, instruct, &i, st);
 	if (start != i)
 	{
+		i = skip_all_quotes(buffer, i);
 		instruct->ind++;
 		tmp = ft_substr(buffer, start, i - start);
 		if (!is_redirect(instruct, tmp, st))
