@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 14:36:14 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/04 15:00:53 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/05 11:40:03 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,29 @@ int	is_valid_char(char c)
 	return (1);
 }
 
-static void	skip_quotes(char *buffer, int *opened, int *i)
+int	skip_quotes(char *str, int i)
 {
-	*opened = buffer[(*i)];
-	while (buffer[++(*i)] && buffer[*i] != *opened)
-		continue ;
+	int	opened;
+
+	opened = 0;
+	if (str[i] == '\'' || str[i] == '"')
+	{
+		opened = str[i];
+		while (str[++i] != opened)
+			continue;
+	}
+	return (i);
+}
+
+void	switch_quotes(char c, int *opened)
+{
+	if (c == '\'' || c == '"')
+	{
+		if (!(*opened))
+			*opened = c;
+		else if (*opened == c)
+			*opened = 0;
+	}
 }
 
 int	parse_buffer(char *buffer, t_instruct *ins, int *i, int *st)
@@ -33,11 +51,11 @@ int	parse_buffer(char *buffer, t_instruct *ins, int *i, int *st)
 	int		opened;
 
 	start = 0;
+	opened = 0;
 	while (buffer[++(*i)])
 	{
-		if (buffer[*i] == '\'' || buffer[*i] == '"')
-			skip_quotes(buffer, &opened, i);
-		if (!is_valid_char(buffer[*i]))
+		switch_quotes(buffer[*i], &opened);
+		if (!is_valid_char(buffer[*i]) && !opened)
 		{
 			ins->ind++;
 			tmp = ft_substr(buffer, start, *i - start);

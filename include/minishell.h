@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/05 10:13:19 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/05 11:40:18 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,7 @@ extern char	**g_envp;
 void		signal_init(int type);
 
 void		start_parsing(char *buffer, t_instruct *instruct, int *st);
+int			skip_quotes(char *str, int i);
 
 char		*replace_vars(t_instruct *ins, char *old, int *st);
 char		*replace_roots(char *old);

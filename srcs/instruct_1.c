@@ -6,11 +6,27 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 14:50:29 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/04/03 15:55:32 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/05 11:41:36 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
+int	get_pipes_amt(char *str)
+{
+	int	i;
+	int	count;
+	
+	i = -1;
+	count = 0;
+	while (str[++i])
+	{
+		i = skip_quotes(str, i);
+		if (str[i] == '|')
+			count++;
+	}
+	return (count);
+}
 
 t_instruct	init_tabinstruct(char *str)
 {
@@ -21,16 +37,16 @@ t_instruct	init_tabinstruct(char *str)
 	tab.size = 0;
 	if (!str)
 		return (tab);
-	i = -1;
-	while (str[++i])
-		if (str[i] == '|')
-			tab.size++;
+	tab.size = get_pipes_amt(str);
 	tab.i_tab = malloc(sizeof(int) * (tab.size + 1));
 	j = -1;
 	i = -1;
 	while (str[++i])
+	{
+		i = skip_quotes(str, i);
 		if (str[i] == '|')
 			tab.i_tab[++j] = PIPE;
+	}
 	tab.i_tab[++j] = 0;
 	tab.dup_enter = -1;
 	tab.dup_exit = -1;
