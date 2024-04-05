@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/18 11:06:39 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:56:43 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/05 08:39:30 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,15 @@ char	*get_pipes_heredoc(int pipes_amt)
 		out = ft_strjoin(out, "pipe ", 1);
 	out = ft_strjoin(out, "heredoc> ", 1);
 	return (out);
+}
+
+int	is_empty_char(char *s)
+{
+	int	i;
+
+	i = -1;
+	while (s[++i])
+		if (s[i] > 32 && s[i] < 127)
+			return (0);
+	return (1);
 }

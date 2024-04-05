@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:33:34 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/03 15:56:33 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/05 08:44:14 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,8 @@ void	tab_free(char **strs)
 	int	i;
 
 	i = -1;
+	if (!strs)
+		return ;
 	while (strs[++i])
 		free(strs[i]);
 	free(strs);

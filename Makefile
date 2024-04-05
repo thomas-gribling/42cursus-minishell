@@ -6,7 +6,7 @@ INCLUDE = include/
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
-FILES = main.c parsing.c wildcards.c instruct_1.c instruct_2.c paths.c \
+FILES = main.c signals.c parsing.c wildcards.c instruct_1.c instruct_2.c paths.c \
 		exec.c redirect_1.c redirect_2.c utils_redirect.c check_redirect.c \
 		pipes.c builtins_1.c builtins_2.c builtins_env_1.c builtins_env_2.c \
 		utils_1.c utils_2.c utils_3.c ft_split.c ft_itoa.c \

@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:28:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/04 15:22:02 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/05 08:58:13 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,14 @@ int	ft_execve(char *path, char **argv, t_instruct *ins, int do_pipe)
 	return (0);
 }
 
-void	call_ft_execve(char **cmd, t_instruct *ins)
+int	call_ft_execve(char **cmd, t_instruct *ins)
 {
 	int	ind;
 
 	if (ins)
 		ind = ins->ind;
 	if (ins->ind > ins->size || ins->ind < 0)
-		return ;
+		return (0);
 	if (ins && ind <= ins->size)
 	{
 		if (!ind && !ins->size)
@@ -49,6 +49,7 @@ void	call_ft_execve(char **cmd, t_instruct *ins)
 	}
 	else
 		ft_execve(cmd[0], cmd, ins, 0);
+	return (1);
 }
 
 int	exe_command_path(char **cmd, t_instruct *ins, char *cmd_err, int *st)
@@ -59,7 +60,10 @@ int	exe_command_path(char **cmd, t_instruct *ins, char *cmd_err, int *st)
 	cmd[0] = try_path(paths, cmd[0]);
 	tab_free(paths);
 	if (!cmd[0])
+	{
+		cmd[0] = ft_strdup("foo");
 		return (ft_putferror(ERR_NOCMD, cmd_err, st, 127), 0);
+	}
 	else
 		call_ft_execve(cmd, ins);
 	return (1);
@@ -84,7 +88,7 @@ int	exe_command(char **cmd, t_instruct *ins, int *st)
 		else if ((access(cmd[0], X_OK)))
 			ft_putferror(ERR_NOPERM, cmd_err, st, 126);
 		else
-			call_ft_execve(cmd, ins);
+			out = call_ft_execve(cmd, ins);
 	}
 	else
 		out = exe_command_path(cmd, ins, cmd_err, st);
@@ -93,13 +97,13 @@ int	exe_command(char **cmd, t_instruct *ins, int *st)
 	return (out);
 }
 
-void	exe_command_quick(char *command)
+void	exe_command_quick(char *command, char **paths, char *cmd)
 {
-	char	**paths;
-	char	*cmd;
 	pid_t	p;
 
 	paths = get_paths();
+	if (!paths)
+		return ;
 	cmd = ft_strdup(command);
 	cmd = try_path(paths, cmd);
 	tab_free(paths);

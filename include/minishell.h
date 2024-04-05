@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/11 11:08:28 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/04 15:22:25 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/05 10:13:19 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,13 +88,15 @@ typedef struct s_redirect
 
 extern char	**g_envp;
 
+void		signal_init(int type);
+
 void		start_parsing(char *buffer, t_instruct *instruct, int *st);
 
 char		*replace_vars(t_instruct *ins, char *old, int *st);
 char		*replace_roots(char *old);
 
 int			exe_command(char **cmd, t_instruct *ins, int *st);
-void		exe_command_quick(char *command);
+void		exe_command_quick(char *command, char **paths, char *cmd);
 int			is_redirect(t_instruct *ins, char *command, int *st);
 int			exe_builtin(t_instruct *ins, char **cmd, int *st);
 void		dup_fds(t_instruct *ins, int do_pipe);
@@ -146,6 +148,7 @@ char		*str_append(char *old, char c);
 char		**tab_dup(char **tab, int start);
 char		**tab_dup_n(char **tab, int start, int n);
 char		*get_pipes_heredoc(int pipes_amt);
+int			is_empty_char(char *s);
 
 char		**ft_split(char *s, char c);
 char		*ft_itoa(int n);

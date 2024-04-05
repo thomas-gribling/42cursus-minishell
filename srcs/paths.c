@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/15 15:29:15 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/04 14:15:50 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/05 08:57:22 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ char	**get_paths(void)
 	char	*tmp;
 
 	tmp = ft_getenv("PATH");
+	if (!tmp)
+		return (NULL);
 	strs = ft_split(tmp, ':');
 	free(tmp);
 	return (strs);
@@ -38,6 +40,8 @@ char	*try_path(char **strs, char *str)
 	int		i;
 	char	*path;
 
+	if (!strs || !str)
+		return (free(str), NULL);
 	i = 0;
 	while (strs[i])
 	{
