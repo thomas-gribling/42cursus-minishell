@@ -6,7 +6,7 @@
 /*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/03 14:40:37 by tgriblin          #+#    #+#             */
-/*   Updated: 2024/04/04 15:09:51 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/07 17:42:33 by tgriblin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	do_redirects(t_instruct *ins, int *st, t_redirect *red)
 	ins->dup_enter = 0;
 	ins->dup_exit = 1;
 	dup_loop(ins, red, j, st);
-	exe_command(red->cmds[0], ins, st);
+	ins->do_wait += exe_command(red->cmds[0], ins, st);
 	if (!ins->dup_enter)
 		close(ins->pipe_heredoc[0]);
 	close(ins->pipe_heredoc[1]);
