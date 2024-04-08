@@ -37,13 +37,6 @@
 # define HEREDOC_I 4
 # define HEREDOC_O 5
 
-# define LIME "\033[0;92m"
-# define SKY_BLUE "\033[0;96m"
-# define RESET "\033[0m"
-# define WHITE "\033[0;37m"
-# define RED "\033[0;31m"
-# define YELLOW "\033[0;33m"
-# define PINK "\033[0;35m"
 # define PROMPT "\033[0;92m➜  \033[0;96mminishell \033[0m"
 
 # define ERR_NOCMD "%s: command not found\n"

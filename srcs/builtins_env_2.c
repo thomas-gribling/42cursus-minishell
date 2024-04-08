@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_env_2.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tgriblin <tgriblin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ccadoret <ccadoret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/20 10:26:57 by ccadoret          #+#    #+#             */
-/*   Updated: 2024/04/07 17:52:35 by tgriblin         ###   ########.fr       */
+/*   Updated: 2024/04/08 10:21:50 by ccadoret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,18 +15,25 @@
 void	update_pwd(void)
 {
 	int		indice[2];
+	char	*tmp;
 
 	indice[0] = find_var("PWD");
 	indice[1] = find_var("OLDPWD");
 	if (indice[0] >= 0 && indice[1] >= 0)
 	{
+		tmp = ft_getenv("PWD");
+		if (!tmp)
+			return ;
 		free(g_envp[indice[1]]);
-		g_envp[indice[1]] = ft_strjoin("OLDPWD=", ft_getenv("PWD"), 2);
+		g_envp[indice[1]] = ft_strjoin("OLDPWD=", tmp, 2);
 	}
 	if (indice[0] >= 0)
 	{
+		tmp = getcwd(NULL, 0);
+		if (!tmp)
+			return ;
 		free(g_envp[indice[0]]);
-		g_envp[indice[0]] = ft_strjoin("PWD=", getcwd(NULL, 0), 2);
+		g_envp[indice[0]] = ft_strjoin("PWD=", tmp, 2);
 	}
 }
 
