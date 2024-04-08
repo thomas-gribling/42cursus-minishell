@@ -5,7 +5,7 @@
 <p align="center">
         <i>Group project with ccadoret</i><br>
         <i>42 cursus - Rank 3</i><br>
-        Final grade: <b>?/100</b>
+        Final grade: <b>101/100</b>
 </p>
 
 # 📝 Subject
